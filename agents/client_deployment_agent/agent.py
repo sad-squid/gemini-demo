@@ -4,7 +4,7 @@ import json
 from typing import Optional
 from google.adk.agents.llm_agent import Agent
 
-def deploy_client(api_base_url: Optional[str] = None) -> str:
+def deploy_client(api_base_url: Optional[str] = None, google_maps_api_key: Optional[str] = None) -> str:
     """
     Builds the Vite/React frontend with the specified API base URL and deploys it to Firebase Hosting.
     
@@ -12,6 +12,7 @@ def deploy_client(api_base_url: Optional[str] = None) -> str:
         api_base_url: Optional absolute URL of the backend Cloud Run service.
                       (e.g., 'https://local-lens-xxxxxx-uc.a.run.app'). If omitted, the frontend
                       defaults to relative API paths, which works when served from the same container.
+        google_maps_api_key: Optional Google Maps Platform API key to render advance maps in frontend.
                       
     Returns:
         A status report with details about compilation and deployment results.
@@ -28,6 +29,11 @@ def deploy_client(api_base_url: Optional[str] = None) -> str:
         print(f"[Client Deploy] API Base URL configured: {api_base_url}")
     else:
         print("[Client Deploy] No explicit API base URL provided. Building with relative paths.")
+        
+    if google_maps_api_key:
+        env["VITE_GOOGLE_MAPS_API_KEY"] = google_maps_api_key.strip()
+        print("[Client Deploy] Google Maps API Key configured.")
+
         
     build_result = subprocess.run(
         ["npm", "run", "build"],
