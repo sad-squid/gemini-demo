@@ -2,6 +2,8 @@ import React, { useCallback, useState, useRef } from 'react';
 import { UploadCloud, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
 interface UploadZoneProps {
   onUploadComplete: (data: any) => void;
 }
@@ -29,7 +31,7 @@ const UploadZone: React.FC<UploadZoneProps> = ({ onUploadComplete }) => {
     formData.append('file', file);
     
     try {
-      const response = await fetch('http://localhost:8000/api/ingest', {
+      const response = await fetch(`${API_BASE_URL}/api/ingest`, {
         method: 'POST',
         body: formData,
       });

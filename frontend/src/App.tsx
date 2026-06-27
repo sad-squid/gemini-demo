@@ -5,6 +5,8 @@ import UploadZone from './components/UploadZone';
 import PulseFeed, { type FeedItem } from './components/PulseFeed';
 import ConciergeChat from './components/ConciergeChat';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
 function App() {
   const [entities, setEntities] = useState<any[]>([]);
   const [center, setCenter] = useState({ lat: 35.6620, lng: 139.7038 }); // Shibuya, Tokyo
@@ -13,7 +15,7 @@ function App() {
   // 1. Fetch initial spots from DB on load
   const fetchLocations = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/locations');
+      const response = await fetch(`${API_BASE_URL}/api/locations`);
       const result = await response.json();
       if (result.status === 'success' && Array.isArray(result.data)) {
         setEntities(result.data);

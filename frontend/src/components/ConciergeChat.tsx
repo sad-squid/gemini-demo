@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
 interface Message {
   id: string;
   sender: 'user' | 'concierge';
@@ -128,7 +130,7 @@ const ConciergeChat: React.FC<ConciergeChatProps> = () => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:8000/api/chat', {
+      const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

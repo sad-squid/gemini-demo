@@ -130,8 +130,36 @@ gcloud run deploy locus-gemini \
 
 ---
 
+## Option C: High-Performance Separate Frontend Deployment (Firebase Hosting)
+
+For maximum speed, CDN caching, and scaling, you can host your React frontend separately on **Firebase Hosting** while calling your Cloud Run backend API.
+
+### 1. Build environment setup
+We refactored the frontend API calls to use Vite's `VITE_API_BASE_URL` environment variable. By default, it uses relative paths (perfect for the unified Cloud Run container). For separate frontend hosting, you must compile your frontend pointing to your absolute Cloud Run Service URL:
+
+```bash
+# In the root level of your workspace
+cd frontend
+VITE_API_BASE_URL="https://locus-gemini-xxxxxx-uc.a.run.app" npm run build
+cd ..
+```
+*(Replace the URL with your actual deployed Cloud Run API service URL).*
+
+### 2. Deploy to Firebase Hosting
+We have pre-configured `firebase.json` and `.firebaserc` at the root of the repository. You can deploy the compiled frontend directly using the Firebase CLI:
+
+```bash
+# Install firebase CLI if not present, then run deployment
+npx -y firebase-tools deploy --only hosting --project noted-fact-500702-h4
+```
+
+This commands uploads the compiled `frontend/dist` directory to Firebase's high-speed global CDN edge servers.
+
+---
+
 ## Verification
 
-Once deployment finishes, `gcloud` will print a secure Service URL (e.g., `https://locus-gemini-xxxxxx-uc.a.run.app`). 
+Once deployment finishes, your app will be accessible via:
+* **Unified setup**: `https://locus-gemini-xxxxxx-uc.a.run.app`
+* **CDN separate setup**: Your custom Firebase Hosting URL (e.g., `https://noted-fact-500702-h4.web.app`)
 
-Open this URL in your web browser to view your glassmorphic frontend, upload location images/flyers, and test real-time LocusGuide chat grounding.
