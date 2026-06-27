@@ -1,0 +1,192 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --bg-color: #0d0d12;
+  --panel-bg: rgba(20, 20, 28, 0.65);
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #f0f0f5;
+  --text-secondary: #9ea3b0;
+  --accent-color: #7b61ff;
+  --accent-glow: rgba(123, 97, 255, 0.4);
+  --success-color: #00d2ff;
+  
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --glass-blur: blur(16px);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+/* Map Area */
+.map-container {
+  flex: 1;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* Side Panel Area */
+.side-panel {
+  width: 420px;
+  height: 100%;
+  background: var(--panel-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-left: 1px solid var(--panel-border);
+  box-shadow: var(--glass-shadow);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.panel-header {
+  margin-bottom: 24px;
+}
+
+.panel-header h1 {
+  font-size: 28px;
+  background: linear-gradient(135deg, #fff 0%, #a594fd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+
+.panel-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* Upload Zone */
+.upload-zone {
+  border: 2px dashed var(--panel-border);
+  border-radius: 16px;
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: rgba(255, 255, 255, 0.02);
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-zone:hover {
+  border-color: var(--accent-color);
+  background: rgba(123, 97, 255, 0.05);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.upload-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(123, 97, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  color: var(--accent-color);
+}
+
+.upload-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.upload-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Pulse Feed */
+.pulse-feed h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feed-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 16px;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.feed-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-2px);
+}
+
+.feed-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #2a2a35;
+}
+
+.feed-content h3 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.feed-content p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.tag-container {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(123, 97, 255, 0.15);
+  color: #c4b5fd;
+  font-weight: 500;
+}
