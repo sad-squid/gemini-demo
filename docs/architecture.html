@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: 'Google Sans', sans-serif;
-            background-color: #F8F9FA;
+            background-color: #f8fafd; /* Soft Google background */
             color: #202124;
             margin: 0;
             padding: 40px;
@@ -20,86 +20,108 @@
         .container {
             background-color: white;
             padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            max-width: 1000px;
+            border-radius: 28px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            max-width: 1200px;
             width: 100%;
             text-align: center;
+            border-top: 8px solid #4285F4; /* Google Blue Accent */
         }
         h1 {
-            color: #1a73e8;
+            color: #202124;
+            font-size: 36px;
             margin-top: 0;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
         }
         p.desc {
             color: #5f6368;
-            font-size: 16px;
+            font-size: 18px;
             margin-bottom: 40px;
         }
         .mermaid {
             display: flex;
             justify-content: center;
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
         }
     </style>
     <!-- Load Mermaid.js -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
-        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'base',
+            themeVariables: {
+                fontFamily: 'Google Sans'
+            }
+        });
     </script>
 </head>
 <body>
     <div class="container">
         <h1>Local Lens System Architecture</h1>
-        <p class="desc">The "Snap & Build" flow and underlying infrastructure powered by Google Cloud and Gemini AI.</p>
+        <p class="desc">The hyper-localized "Snap & Build" flow powered by Google Cloud and Gemini AI.</p>
         
         <div class="mermaid">
-            flowchart TD
-                %% Styling
-                classDef client fill:#4285F4,stroke:#fff,stroke-width:2px,color:#fff,border-radius:8px
-                classDef server fill:#34A853,stroke:#fff,stroke-width:2px,color:#fff,border-radius:8px
-                classDef ai fill:#BE8CFF,stroke:#fff,stroke-width:2px,color:#fff,border-radius:8px
-                classDef db fill:#FBBC05,stroke:#fff,stroke-width:2px,color:#333,border-radius:8px
-                classDef external fill:#EA4335,stroke:#fff,stroke-width:2px,color:#fff,border-radius:8px
+            flowchart LR
+                %% Googley Styling
+                classDef client fill:#e8f0fe,stroke:#4285f4,stroke-width:2px,color:#1967d2,border-radius:12px
+                classDef cloud fill:#f8f9fa,stroke:#dadce0,stroke-width:2px,color:#202124,border-radius:12px
+                classDef ai fill:#fce8e6,stroke:#ea4335,stroke-width:2px,color:#c5221f,border-radius:12px
+                classDef external fill:#fef7e0,stroke:#fbbc05,stroke-width:2px,color:#ea8600,border-radius:12px
+                classDef db fill:#e6f4ea,stroke:#34a853,stroke-width:2px,color:#137333,border-radius:12px
                 
-                subgraph ClientLayer ["Client Layer (Web / Mobile)"]
-                    UI["React / Next.js Map UI\n(Mapbox Integration)"]:::client
-                    Chat["Local Lens Concierge\n(Chat Interface)"]:::client
+                subgraph App ["📱 Application"]
+                    direction TB
+                    UI["Next.js Map UI"]:::client
+                    Chat["Local Lens Chat"]:::client
                 end
                 
-                subgraph CloudInfra ["Google Cloud Run (Compute)"]
-                    API["Node.js / Express API Gateway"]:::server
-                    AgentManager["Agent Orchestrator\n(Background Workers)"]:::server
+                subgraph Backend ["☁️ Cloud Run Backend"]
+                    direction TB
+                    API["Node.js Gateway"]:::cloud
+                    Agent["Agent Orchestrator"]:::cloud
                 end
                 
-                subgraph GoogleAI ["Gemini AI Layer"]
-                    VisionAPI["Gemini Multimodal API\n(Image-to-JSON Parser)"]:::ai
-                    TextAPI["Gemini Text API\n(Logic & Chat Reasoning)"]:::ai
+                subgraph AI_Layer ["🧠 Intelligence"]
+                    direction TB
+                    Vision["Gemini Multimodal\n(Vision Extraction)"]:::ai
+                    Text["Gemini Text\n(Reasoning)"]:::ai
                 end
                 
-                subgraph DataLayer ["Data Storage"]
-                    Firestore[("Cloud Firestore\n(Events, Venues, Geo-data)")]:::db
+                subgraph Search ["🌐 External"]
+                    Web["Google Grounding / Web"]:::external
+                end
+
+                subgraph Data ["🗄️ Persistence"]
+                    Firestore[("Cloud Firestore")]:::db
                 end
                 
-                subgraph External ["External RAG / Search"]
-                    WebSearch["Google Grounding / Web\n(Fetch Lat/Long, Links)"]:::external
-                end
+                %% Core Data Flow
+                UI -- "1. Upload Photo" --> API
+                API -- "2. Parse Flyer" --> Vision
+                Vision -- "3. Entity JSON" --> API
+                API -- "4. Trigger Agent" --> Agent
+                Agent -- "5. Think" --> Text
+                Agent -- "6. Search Lat/Long" --> Web
+                Agent -- "7. Store" --> Firestore
                 
-                %% Main Application Flow
-                UI -- "1. Uploads Flyer Image" --> API
-                API -- "2. Sends Image Payload" --> VisionAPI
-                VisionAPI -- "3. Returns Extracted Entity (JSON)" --> API
-                
-                API -- "4. Queues Enrichment Task" --> AgentManager
-                AgentManager -- "Orchestrates Reasoning" --> TextAPI
-                AgentManager -- "5. Searches for Geo/Event Links" --> WebSearch
-                AgentManager -- "6. Commits Verified Data" --> Firestore
-                
-                UI -- "7. Streams Live Updates" --> Firestore
+                %% Sync Flow
+                Firestore -. "8. Live Sync" .-> UI
                 
                 %% Chat Flow
-                Chat -- "Asks Local Question" --> API
-                API -- "Queries DB for Context" --> Firestore
-                API -- "Context + Prompt" --> TextAPI
-                TextAPI -- "Returns Grounded Answer" --> Chat
+                Chat -- "Ask Question" --> API
+                API -- "Grounding" --> Firestore
+                API -- "Context Prompt" --> Text
+                Text -- "Grounded Answer" --> Chat
+                
+                style App fill:transparent,stroke:#dadce0,stroke-dasharray: 5 5,color:#5f6368
+                style Backend fill:transparent,stroke:#dadce0,stroke-dasharray: 5 5,color:#5f6368
+                style AI_Layer fill:transparent,stroke:#dadce0,stroke-dasharray: 5 5,color:#5f6368
+                style Data fill:transparent,stroke:#dadce0,stroke-dasharray: 5 5,color:#5f6368
+                style Search fill:transparent,stroke:#dadce0,stroke-dasharray: 5 5,color:#5f6368
         </div>
     </div>
 </body>
