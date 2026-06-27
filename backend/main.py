@@ -77,8 +77,6 @@ async def ingest_image(file: UploadFile = File(...)):
     blob = bucket.blob(unique_filename)
     blob.upload_from_string(content, content_type=file.content_type or "image/jpeg")
     
-    # Make it publicly accessible
-    blob.make_public()
     public_url = blob.public_url
     
     print(f"Saved uploaded flyer to GCS: {public_url}")
