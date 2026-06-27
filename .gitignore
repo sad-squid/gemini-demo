@@ -22,3 +22,4 @@ env/
 node_modules/
 dist/
 .oxlintrc.json
+docs/token.json

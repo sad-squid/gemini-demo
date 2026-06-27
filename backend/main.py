@@ -10,6 +10,8 @@ import re
 import subprocess
 import PIL.Image
 from typing import Optional, List
+import uuid
+from google.cloud import storage
 
 # Ensure repository root is in python path for local imports to work
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -59,13 +61,27 @@ async def ingest_image(file: UploadFile = File(...)):
     Accepts an uploaded image of a flyer/menu/poster.
     Utilizes Google Antigravity SDK to parse and enrich extracted entities.
     """
-    # 1. Read and save the file locally
+    # 1. Upload the file to Google Cloud Storage
     content = await file.read()
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
-    with open(file_path, "wb") as f:
-        f.write(content)
     
-    print(f"Saved uploaded flyer: {file_path}")
+    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "noted-fact-500702-h4")
+    bucket_name = f"{project_id}-uploads"
+    storage_client = storage.Client(project=project_id)
+    
+    try:
+        bucket = storage_client.get_bucket(bucket_name)
+    except Exception:
+        bucket = storage_client.create_bucket(bucket_name, location="us-central1")
+        
+    unique_filename = f"{uuid.uuid4()}-{file.filename}"
+    blob = bucket.blob(unique_filename)
+    blob.upload_from_string(content, content_type=file.content_type or "image/jpeg")
+    
+    # Make it publicly accessible
+    blob.make_public()
+    public_url = blob.public_url
+    
+    print(f"Saved uploaded flyer to GCS: {public_url}")
     
     # 2. Run multimodal parser using google-genai
     try:
@@ -135,6 +151,7 @@ async def ingest_image(file: UploadFile = File(...)):
                 raise HTTPException(status_code=500, detail="Failed to extract JSON from enrichment agent output")
                 
         enriched_data = json.loads(enriched_json_str)
+        enriched_data["sourceImage"] = public_url
         print(f"Enriched Data Resolved: {enriched_data}")
         
     except Exception as e:

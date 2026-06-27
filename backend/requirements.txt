@@ -4,3 +4,4 @@ python-multipart==0.0.9
 google-antigravity==0.1.0
 pydantic==2.6.4
 python-dotenv==1.0.1
+google-cloud-storage==2.14.0
