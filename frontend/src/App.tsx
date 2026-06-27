@@ -88,7 +88,7 @@ function App() {
       
       <div className="side-panel">
         <div className="panel-header">
-          <h1>LocusGemini</h1>
+          <h1>Local Lens</h1>
           <p>Tokyo active AI-guided mapping engine</p>
         </div>
 
@@ -134,7 +134,7 @@ function App() {
               transition: 'all 0.2s'
             }}
           >
-            <Sparkles size={14} /> LocusGuide
+            <Sparkles size={14} /> LocalGuide
           </button>
         </div>
         

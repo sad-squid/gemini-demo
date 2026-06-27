@@ -28,7 +28,7 @@ root_agent = Agent(
     name='enrichment_agent',
     description='An autonomous search agent that verifies and enriches extracted entities with geolocations, ratings, and social handles.',
     instruction=(
-        "You are LocusGemini's active enrichment agent. Given an extracted entity from a visual upload, "
+        "You are Local Lens's active enrichment agent. Given an extracted entity from a visual upload, "
         "use the google_search tool to perform search grounding. Your job is to:\n"
         "1. Verify and clean up the name, description, and physical address of the entity.\n"
         "2. Find the exact latitude and longitude for the physical address.\n"

@@ -1,6 +1,6 @@
-# Deploying LocusGemini to Google Cloud Run
+# Deploying Local Lens to Google Cloud Run
 
-This guide outlines how to stand up the unified **LocusGemini** application (React frontend + FastAPI backend + ADK Agents) on **Google Cloud Run**.
+This guide outlines how to stand up the unified **Local Lens** application (React frontend + FastAPI backend + ADK Agents) on **Google Cloud Run**.
 
 ---
 
@@ -77,7 +77,7 @@ We provide two approaches for deployment.
 Google Cloud Run can build your container using Google Cloud Build directly from your local directory and deploy it in one step:
 
 ```bash
-gcloud run deploy locus-gemini \
+gcloud run deploy local-lens \
     --source . \
     --project noted-fact-500702-h4 \
     --region us-central1 \
@@ -97,15 +97,15 @@ If you prefer building the container explicitly and pushing it to Artifact Regis
 
 #### 1. Create an Artifact Registry Repository
 ```bash
-gcloud artifacts repositories create locus-gemini-repo \
+gcloud artifacts repositories create local-lens-repo \
     --repository-format=docker \
     --location=us-central1 \
-    --description="LocusGemini Container Repository"
+    --description="Local Lens Container Repository"
 ```
 
 #### 2. Build and Tag the Image
 ```bash
-docker build -t us-central1-docker.pkg.dev/noted-fact-500702-h4/locus-gemini-repo/locus-gemini:latest .
+docker build -t us-central1-docker.pkg.dev/noted-fact-500702-h4/local-lens-repo/local-lens:latest .
 ```
 
 #### 3. Push to Artifact Registry
@@ -114,13 +114,13 @@ docker build -t us-central1-docker.pkg.dev/noted-fact-500702-h4/locus-gemini-rep
 gcloud auth configure-docker us-central1-docker.pkg.dev
 
 # Push the image
-docker push us-central1-docker.pkg.dev/noted-fact-500702-h4/locus-gemini-repo/locus-gemini:latest
+docker push us-central1-docker.pkg.dev/noted-fact-500702-h4/local-lens-repo/local-lens:latest
 ```
 
 #### 4. Deploy the Staged Image to Cloud Run
 ```bash
-gcloud run deploy locus-gemini \
-    --image us-central1-docker.pkg.dev/noted-fact-500702-h4/locus-gemini-repo/locus-gemini:latest \
+gcloud run deploy local-lens \
+    --image us-central1-docker.pkg.dev/noted-fact-500702-h4/local-lens-repo/local-lens:latest \
     --project noted-fact-500702-h4 \
     --region us-central1 \
     --platform managed \
@@ -140,7 +140,7 @@ We refactored the frontend API calls to use Vite's `VITE_API_BASE_URL` environme
 ```bash
 # In the root level of your workspace
 cd frontend
-VITE_API_BASE_URL="https://locus-gemini-xxxxxx-uc.a.run.app" npm run build
+VITE_API_BASE_URL="https://local-lens-xxxxxx-uc.a.run.app" npm run build
 cd ..
 ```
 *(Replace the URL with your actual deployed Cloud Run API service URL).*
@@ -160,6 +160,6 @@ This commands uploads the compiled `frontend/dist` directory to Firebase's high-
 ## Verification
 
 Once deployment finishes, your app will be accessible via:
-* **Unified setup**: `https://locus-gemini-xxxxxx-uc.a.run.app`
+* **Unified setup**: `https://local-lens-xxxxxx-uc.a.run.app`
 * **CDN separate setup**: Your custom Firebase Hosting URL (e.g., `https://noted-fact-500702-h4.web.app`)
 

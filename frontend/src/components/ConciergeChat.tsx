@@ -91,7 +91,7 @@ const ConciergeChat: React.FC<ConciergeChatProps> = () => {
     {
       id: 'welcome',
       sender: 'concierge',
-      text: "Hello! I am **LocusGuide**, your hyper-local Tokyo AI concierge. I can plan dates, craft itineraries, or recommend spots using ONLY verified flyers and menus added to our map. Ask me anything!",
+      text: "Hello! I am **LocalGuide**, your hyper-local Tokyo AI concierge. I can plan dates, craft itineraries, or recommend spots using ONLY verified flyers and menus added to our map. Ask me anything!",
       timestamp: new Date()
     }
   ]);
@@ -102,10 +102,10 @@ const ConciergeChat: React.FC<ConciergeChatProps> = () => {
 
   // Generate or retrieve Session ID on mount
   useEffect(() => {
-    let savedSession = localStorage.getItem('locus_gemini_session_id');
+    let savedSession = localStorage.getItem('local_lens_session_id');
     if (!savedSession) {
       savedSession = 'session_' + Math.random().toString(36).substring(2, 11);
-      localStorage.setItem('locus_gemini_session_id', savedSession);
+      localStorage.setItem('local_lens_session_id', savedSession);
     }
     setSessionId(savedSession);
   }, []);
@@ -304,7 +304,7 @@ const ConciergeChat: React.FC<ConciergeChatProps> = () => {
         <input
           type="text"
           className="chat-input"
-          placeholder="Ask LocusGuide to build an itinerary..."
+          placeholder="Ask LocalGuide to build an itinerary..."
           style={{
             flex: 1,
             background: 'none',

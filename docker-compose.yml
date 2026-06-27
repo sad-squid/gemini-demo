@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  locus-gemini:
+  local-lens:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: locus_gemini_app
+    container_name: local_lens_app
     ports:
       - "8000:8000"
     environment:

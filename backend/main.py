@@ -21,7 +21,7 @@ from google.genai import types
 from agents.ingestion_agent.agent import ExtractedEntity
 from agents.concierge_agent.db import add_entity, get_all_entities
 
-app = FastAPI(title="LocusGemini Backend API")
+app = FastAPI(title="Local Lens Backend API")
 
 # Allow frontend to communicate with backend
 app.add_middleware(

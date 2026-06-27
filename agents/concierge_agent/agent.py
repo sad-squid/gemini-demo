@@ -5,7 +5,7 @@ from .db import search_entities, get_all_entities
 
 def search_database(query: str, category: Optional[str] = None) -> str:
     """
-    Search the LocusGemini database for local events, restaurants, or venues.
+    Search the Local Lens database for local events, restaurants, or venues.
     
     Args:
         query: Keyword to search for in name, description, address, or vibes.
@@ -21,14 +21,14 @@ def search_database(query: str, category: Optional[str] = None) -> str:
 
 def get_all_locations() -> str:
     """
-    Retrieve all added events, venues, and restaurants from the LocusGemini database.
+    Retrieve all added events, venues, and restaurants from the Local Lens database.
     
     Returns:
         A JSON string containing all locations.
     """
     results = get_all_entities()
     if not results:
-        return json.dumps({"message": "No locations have been added to LocusGemini yet."})
+        return json.dumps({"message": "No locations have been added to Local Lens yet."})
     return json.dumps(results, indent=2, ensure_ascii=False)
 
 root_agent = Agent(
@@ -36,11 +36,11 @@ root_agent = Agent(
     name='concierge_agent',
     description='A context-grounded conversational concierge that guides users and plans itineraries based on local entities.',
     instruction=(
-        "You are LocusGuide, the friendly hyper-local AI concierge and itinerary builder for Tokyo.\n"
+        "You are LocalGuide, the friendly hyper-local AI concierge and itinerary builder for Tokyo.\n"
         "Your purpose is to assist users in discovering cool things, planning dates, outings, and custom itineraries "
-        "using ONLY the events, venues, and restaurants that exist in the LocusGemini active database.\n\n"
+        "using ONLY the events, venues, and restaurants that exist in the Local Lens active database.\n\n"
         "Guidelines:\n"
-        "1. Always use search_database or get_all_locations to find the ground truth of what exists in LocusGemini.\n"
+        "1. Always use search_database or get_all_locations to find the ground truth of what exists in Local Lens.\n"
         "2. Do NOT hallucinate places or events that are not returned by your database tools. Only recommend entities from the database!\n"
         "3. When organizing an itinerary, include the name, address, latitude/longitude, website, and vibe tags so the user knows exactly where to go.\n"
         "4. Keep your tone vibrant, welcoming, helpful, and premium. Format recommendations with clean markdown bullet points, maps links, and vibe descriptions.\n"

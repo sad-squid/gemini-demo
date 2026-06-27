@@ -47,7 +47,7 @@ root_agent = Agent(
     name='ingestion_agent',
     description='A multimodal ingestion agent that extracts structured information from flyer, menu, and context images.',
     instruction=(
-        "You are LocusGemini's visual parser. Analyse the uploaded multimodal image ( flyer, menu, ticket, billboard, etc.) "
+        "You are Local Lens's visual parser. Analyse the uploaded multimodal image ( flyer, menu, ticket, billboard, etc.) "
         "and extract the relevant event, venue, or restaurant details. Return them strictly adhering to the output_schema structure."
     ),
     output_schema=ExtractedEntity,

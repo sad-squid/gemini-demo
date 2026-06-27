@@ -35,7 +35,7 @@ const MapDashboard: React.FC<MapDashboardProps> = ({ markers, center }) => {
           center={center}
           defaultZoom={15}
           gestureHandling={'greedy'}
-          mapId="LOCUS_GEMINI_MAP_ID"
+          mapId="LOCAL_LENS_MAP_ID"
           disableDefaultUI={false}
           style={{ width: '100%', height: '100%' }}
         >
