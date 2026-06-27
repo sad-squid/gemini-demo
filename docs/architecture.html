@@ -65,63 +65,73 @@
         <p class="desc">The hyper-localized "Snap & Build" flow powered by Google Cloud and Gemini AI.</p>
         
         <div class="mermaid">
-            flowchart LR
-                %% Googley Styling
+            flowchart TD
+                %% Googley Color Palette Styling
                 classDef client fill:#e8f0fe,stroke:#4285f4,stroke-width:2px,color:#1967d2,border-radius:12px
                 classDef cloud fill:#f8f9fa,stroke:#dadce0,stroke-width:2px,color:#202124,border-radius:12px
                 classDef ai fill:#fce8e6,stroke:#ea4335,stroke-width:2px,color:#c5221f,border-radius:12px
                 classDef external fill:#fef7e0,stroke:#fbbc05,stroke-width:2px,color:#ea8600,border-radius:12px
                 classDef db fill:#e6f4ea,stroke:#34a853,stroke-width:2px,color:#137333,border-radius:12px
                 
-                subgraph App ["📱 Application"]
+                subgraph Client ["📱 Client Application (Vite + React)"]
                     direction TB
-                    UI["Next.js Map UI"]:::client
-                    Chat["Local Lens Chat"]:::client
+                    UI["App.tsx (Layout & Mobile Stacking)"]:::client
+                    UploadZone["UploadZone (Mobile Camera & Stage Indicators)"]:::client
+                    MapComponent["MapDashboard (Custom Emoji Pins)"]:::client
+                    Snackbar["EntitySnackbar (Lightbox & Similarity Carousel)"]:::client
                 end
                 
-                subgraph Backend ["☁️ Cloud Run Backend"]
+                subgraph CloudRun ["☁️ Cloud Run Backend (FastAPI)"]
                     direction TB
-                    API["Node.js Gateway"]:::cloud
-                    Agent["Agent Orchestrator"]:::cloud
+                    API["FastAPI API Gateway"]:::cloud
+                    EnrichAgent["ADK Enrichment Agent"]:::cloud
                 end
                 
-                subgraph AI_Layer ["🧠 Intelligence"]
-                    direction TB
-                    Vision["Gemini Multimodal\n(Vision Extraction)"]:::ai
-                    Text["Gemini Text\n(Reasoning)"]:::ai
+                subgraph AIService ["🧠 Google GenAI (Gemini)"]
+                    direction LR
+                    GeminiIngest["Gemini 2.5 Flash\n(Multimodal Parser)"]:::ai
+                    GeminiAgent["Gemini 2.5 Flash\n(Agent LLM)"]:::ai
                 end
                 
-                subgraph Search ["🌐 External"]
-                    Web["Google Grounding / Web"]:::external
-                end
-
-                subgraph Data ["🗄️ Persistence"]
-                    Firestore[("Cloud Firestore")]:::db
+                subgraph StorageDB ["🗄️ Google Cloud & Persistence"]
+                    direction LR
+                    GCS[("Google Cloud Storage\n(Flyer Images)")]:::db
+                    Firestore[("Cloud Firestore\n(or local JSON DB)")]:::db
                 end
                 
-                %% Core Data Flow
-                UI -- "1. Upload Photo" --> API
-                API -- "2. Parse Flyer" --> Vision
-                Vision -- "3. Entity JSON" --> API
-                API -- "4. Trigger Agent" --> Agent
-                Agent -- "5. Think" --> Text
-                Agent -- "6. Search Lat/Long" --> Web
-                Agent -- "7. Store" --> Firestore
+                subgraph External ["🌐 External Services"]
+                    direction LR
+                    GoogleSearch["Google Search\n(Grounding Tool)"]:::external
+                    MapsPlatform["Google Maps Platform\n(JS SDK & Tiles)"]:::external
+                end
                 
-                %% Sync Flow
-                Firestore -. "8. Live Sync" .-> UI
+                %% Core Ingestion Flow
+                UploadZone -- "1. Pass Photo File" --> UI
+                UI -- "2. Upload Photo (/api/ingest)" --> API
                 
-                %% Chat Flow
-                Chat -- "Ask Question" --> API
-                API -- "Grounding" --> Firestore
-                API -- "Context Prompt" --> Text
-                Text -- "Grounded Answer" --> Chat
+                API -- "3. Store Image" --> GCS
+                API -- "4. Parse Image & Extract Emoji" --> GeminiIngest
+                GeminiIngest -- "5. ExtractedEntity JSON" --> API
                 
-                style App fill:transparent,stroke:#dadce0,stroke-dasharray: 5 5,color:#5f6368
-                style Backend fill:transparent,stroke:#dadce0,stroke-dasharray: 5 5,color:#5f6368
-                style AI_Layer fill:transparent,stroke:#dadce0,stroke-dasharray: 5 5,color:#5f6368
-                style Data fill:transparent,stroke:#dadce0,stroke-dasharray: 5 5,color:#5f6368
-                style Search fill:transparent,stroke:#dadce0,stroke-dasharray: 5 5,color:#5f6368
+                API -- "6. Spawn (adk run)" --> EnrichAgent
+                EnrichAgent -- "7. Verify Address & Socials" --> GoogleSearch
+                EnrichAgent -- "8. Geolocate & Resolve (Lat/Long)" --> GeminiAgent
+                EnrichAgent -- "9. Store Enriched Entity" --> Firestore
+                
+                Firestore -. "10. Synchronize Locations" .-> UI
+                
+                %% Frontend Render Flow
+                UI -- "Render Custom Pins" --> MapComponent
+                UI -- "Display Selected Spot" --> Snackbar
+                
+                MapComponent -- "Load SDK (apiKey & mapId)" --> MapsPlatform
+                Snackbar -- "Refetch/Lightbox Actions" --> UI
+                
+                style Client fill:transparent,stroke:#4285f4,stroke-width:1.5px,stroke-dasharray: 5 5,color:#5f6368
+                style CloudRun fill:transparent,stroke:#dadce0,stroke-width:1.5px,stroke-dasharray: 5 5,color:#5f6368
+                style AIService fill:transparent,stroke:#ea4335,stroke-width:1.5px,stroke-dasharray: 5 5,color:#5f6368
+                style StorageDB fill:transparent,stroke:#34a853,stroke-width:1px,stroke-dasharray: 5 5,color:#5f6368
+                style External fill:transparent,stroke:#fbbc05,stroke-width:1px,stroke-dasharray: 5 5,color:#5f6368
         </div>
     </div>
 </body>
