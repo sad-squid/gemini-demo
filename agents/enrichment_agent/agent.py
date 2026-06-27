@@ -26,7 +26,7 @@ class EnrichedEntity(BaseModel):
     vibe_tags: List[str] = Field(default_factory=list, description="Verified mood/vibe tags representing the place or event")
 
 root_agent = Agent(
-    model='gemini-2.5-flash',
+    model='gemini-3.5-flash',
     name='enrichment_agent',
     description='An autonomous search active enrichment agent that verifies and enriches extracted entities with geolocations, ratings, and social handles.',
     instruction=(

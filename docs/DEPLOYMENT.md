@@ -12,7 +12,7 @@ graph TD
     subgraph CloudRunContainer [Unified Container]
         FastAPI[FastAPI Server] -->|Serves| Static[React Frontend Build]
         FastAPI -->|Invokes| ADK[ADK Agents]
-        FastAPI -->|Calls| Gemini[Gemini 2.5 API via Vertex AI]
+        FastAPI -->|Calls| Gemini[Gemini 3.5 API via Vertex AI]
     end
     Gemini -->|Google Search Grounding| Web[Google Search Engine]
 ```

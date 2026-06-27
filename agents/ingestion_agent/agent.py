@@ -51,7 +51,7 @@ class ExtractedEntity(BaseModel):
     )
 
 root_agent = Agent(
-    model='gemini-2.5-flash',
+    model='gemini-3.5-flash',
     name='ingestion_agent',
     description='A multimodal ingestion agent that extracts structured information from flyer, menu, and context images.',
     instruction=(

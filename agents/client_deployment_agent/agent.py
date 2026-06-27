@@ -119,7 +119,7 @@ def deploy_client(api_base_url: Optional[str] = None, google_maps_api_key: Optio
     return json.dumps(success_report, indent=2)
  
 root_agent = Agent(
-    model='gemini-2.5-flash',
+    model='gemini-3.5-flash',
     name='client_deployment_agent',
     description='An agent that builds the React frontend and deploys it to high-speed Firebase Hosting CDN.',
     instruction=(

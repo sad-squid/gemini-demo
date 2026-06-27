@@ -32,7 +32,7 @@ def get_all_locations() -> str:
     return json.dumps(results, indent=2, ensure_ascii=False)
 
 root_agent = Agent(
-    model='gemini-2.5-flash',
+    model='gemini-3.5-flash',
     name='concierge_agent',
     description='A context-grounded conversational concierge that guides users and plans itineraries based on local entities.',
     instruction=(

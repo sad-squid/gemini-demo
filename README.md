@@ -11,7 +11,7 @@ Welcome to the **Local Lens** codebase! This repository is built for the **Gemin
   * Displays dynamic styled markers categorized by type (event, restaurant, general spot).
   * Integrates a real-time **My Location** re-centering button with browser Geolocation APIs and a custom animated pulsing radar indicator.
 * **🧠 Intelligent Gemini & ADK Ingest Engine**:
-  * Leverages **Gemini 2.5 Flash** for multimodal visual layout parsing and metadata extraction.
+  * Leverages **Gemini 3.5 Flash** for multimodal visual layout parsing and metadata extraction.
   * Integrates with an **Active Search Grounding Agent** to automatically verify coordinates, resolve street addresses, and enrich social links.
 * **📱 Premium Responsive Layout & Mobile Bottom Sheet**:
   * Bottom sheet collapses dynamically to a compact `60px` header or expands smoothly to `55vh` with fluid spring transitions.
@@ -30,7 +30,7 @@ This guide clarifies the project's layout, detailing what each directory and fil
 ```
 gemini-demo/
 ├── agents/                       # 🧠 Google ADK & LLM Agents
-│   ├── ingestion_agent/          # Multimodal ingestion and schema parser (Gemini 2.5 Flash)
+│   ├── ingestion_agent/          # Multimodal ingestion and schema parser (Gemini 3.5 Flash)
 │   ├── enrichment_agent/         # Active Google Search Grounding & geolocation verification agent
 │   ├── concierge_agent/          # (Future/Draft) Conversational assistant and itinerary builder
 │   ├── client_deployment_agent/  # Automation script for frontend packaging and build injections
@@ -82,7 +82,7 @@ To keep things neat, all project notes, technical specifications, slides, and di
 *   [docs/SCHEMAS.md](file:///Users/c3d/git/gemini-hackathon/gemini-demo/docs/SCHEMAS.md) — The data contract. Defines the structured TypeScript interfaces for parsed objects, event lineups, restaurant menus, and the extraction system prompts that govern Gemini's JSON responses.
 
 ### 2. Architecture & Deployment
-*   [docs/architecture.html](file:///Users/c3d/git/gemini-hackathon/gemini-demo/docs/architecture.html) — An interactive system architecture diagram built with Mermaid.js. It diagrams the top-down visual ingestion flow (from user image upload to GCS storage, Gemini 2.5 Flash parsing, ADK active Google Search grounding, and Firestore persistence) and Google Maps rendering.
+*   [docs/architecture.html](file:///Users/c3d/git/gemini-hackathon/gemini-demo/docs/architecture.html) — An interactive system architecture diagram built with Mermaid.js. It diagrams the top-down visual ingestion flow (from user image upload to GCS storage, Gemini 3.5 Flash parsing, ADK active Google Search grounding, and Firestore persistence) and Google Maps rendering.
 *   [docs/DEPLOYMENT.md](file:///Users/c3d/git/gemini-hackathon/gemini-demo/docs/DEPLOYMENT.md) — Complete operations guide. Explains how to bundle the React frontend, package the application into a single Docker image, configure GCS uniform access, and deploy to Google Cloud Run.
 
 ### 3. Pitch & Presentations

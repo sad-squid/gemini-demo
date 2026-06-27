@@ -71,7 +71,7 @@ def deploy_server_infra() -> str:
     return json.dumps(success_report, indent=2)
 
 root_agent = Agent(
-    model='gemini-2.5-flash',
+    model='gemini-3.5-flash',
     name='server_deployment_agent',
     description='An agent that builds the unified container image using Cloud Build and deploys it to Google Cloud Run.',
     instruction=(
