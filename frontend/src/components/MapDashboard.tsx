@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { APIProvider, Map, AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
 
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
@@ -13,33 +13,28 @@ interface MarkerData {
 
 interface MapDashboardProps {
   markers: MarkerData[];
+  center: { lat: number; lng: number };
 }
 
-const MapDashboard: React.FC<MapDashboardProps> = ({ markers }) => {
-  const [center, setCenter] = useState({ lat: 35.6620, lng: 139.7038 }); // Shibuya, Tokyo
-
-  // If we get a new marker, center on the latest one
-  React.useEffect(() => {
-    if (markers.length > 0) {
-      const latest = markers[markers.length - 1];
-      setCenter({ lat: latest.lat, lng: latest.lng });
-    }
-  }, [markers]);
-
+const MapDashboard: React.FC<MapDashboardProps> = ({ markers, center }) => {
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <APIProvider apiKey={API_KEY}>
         <Map
-          defaultCenter={center}
+          defaultCenter={{ lat: 35.6620, lng: 139.7038 }}
           center={center}
           defaultZoom={15}
           mapId="LOCUS_GEMINI_MAP_ID"
-          disableDefaultUI={true}
+          disableDefaultUI={false}
           style={{ width: '100%', height: '100%' }}
         >
           {markers.map((marker) => (
              <AdvancedMarker key={marker.id} position={{ lat: marker.lat, lng: marker.lng }} title={marker.title}>
-               <Pin background={marker.type === 'event' ? '#7b61ff' : '#00d2ff'} borderColor={'#5a42d1'} glyphColor={'#fff'} />
+               <Pin 
+                 background={marker.type === 'event' ? '#7b61ff' : '#00d2ff'} 
+                 borderColor={marker.type === 'event' ? '#5a42d1' : '#009ebd'} 
+                 glyphColor={'#fff'} 
+               />
              </AdvancedMarker>
           ))}
         </Map>

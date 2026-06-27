@@ -1,0 +1,24 @@
+# Python compiled bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Local ADK database & state files
+.adk/
+*.db
+
+# Credentials & environment configuration files
+.env
+.env.*
+
+# Local virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# Frontend builds and dependencies
+node_modules/
+dist/
+.oxlintrc.json

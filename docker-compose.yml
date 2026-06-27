@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  locus-gemini:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: locus_gemini_app
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=production
+      - PORT=8000
+      - GOOGLE_GENAI_USE_VERTEXAI=1
+      - GOOGLE_CLOUD_PROJECT=noted-fact-500702-h4
+      - GOOGLE_CLOUD_LOCATION=us-central1
+    volumes:
+      # Mount the local data store JSON file so data is persisted across container runs
+      - ./backend/data_store.json:/app/backend/data_store.json
+    restart: unless-stopped

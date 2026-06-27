@@ -4,6 +4,8 @@
     "gcpRegion": "global",
     "globalPermissionGrants": {
       "allow": [
+        "command(*)",
+        "unsandboxed(*)",
         "write_file(~/git/gemini-hackathon)",
         "read_file(~/git/gemini-hackathon)",
         "mcp(https://gemini-api-docs-mcp.dev)",
