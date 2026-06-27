@@ -14,6 +14,7 @@ interface MarkerData {
 interface MapDashboardProps {
   markers: MarkerData[];
   center: { lat: number; lng: number };
+  onMarkerClick?: (id: string) => void;
 }
 
 const MapUpdater: React.FC<{ center: {lat: number, lng: number} }> = ({ center }) => {
@@ -26,7 +27,7 @@ const MapUpdater: React.FC<{ center: {lat: number, lng: number} }> = ({ center }
   return null;
 };
 
-const MapDashboard: React.FC<MapDashboardProps> = ({ markers, center }) => {
+const MapDashboard: React.FC<MapDashboardProps> = ({ markers, center, onMarkerClick }) => {
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <APIProvider apiKey={API_KEY}>
@@ -41,7 +42,12 @@ const MapDashboard: React.FC<MapDashboardProps> = ({ markers, center }) => {
         >
           <MapUpdater center={center} />
           {markers.map((marker) => (
-             <AdvancedMarker key={marker.id} position={{ lat: marker.lat, lng: marker.lng }} title={marker.title}>
+             <AdvancedMarker 
+               key={marker.id} 
+               position={{ lat: marker.lat, lng: marker.lng }} 
+               title={marker.title}
+               onClick={() => onMarkerClick && onMarkerClick(marker.id)}
+             >
                <Pin 
                  background={marker.type === 'event' ? '#7b61ff' : '#00d2ff'} 
                  borderColor={marker.type === 'event' ? '#5a42d1' : '#009ebd'} 

@@ -4,6 +4,7 @@ import MapDashboard from './components/MapDashboard';
 import UploadZone from './components/UploadZone';
 import PulseFeed, { type FeedItem } from './components/PulseFeed';
 import ConciergeChat from './components/ConciergeChat';
+import EntitySnackbar from './components/EntitySnackbar';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -11,6 +12,7 @@ function App() {
   const [entities, setEntities] = useState<any[]>([]);
   const [center, setCenter] = useState({ lat: 35.6620, lng: 139.7038 }); // Shibuya, Tokyo
   const [activeTab, setActiveTab] = useState<'discover' | 'concierge'>('discover');
+  const [selectedEntity, setSelectedEntity] = useState<any | null>(null);
 
   // 1. Fetch initial spots from DB on load
   const fetchLocations = async () => {
@@ -28,7 +30,44 @@ function App() {
         }
       }
     } catch (err) {
-      console.error('Failed to fetch locations:', err);
+      console.error('Failed to fetch locations, using mock data:', err);
+      const mockData = [
+        {
+          id: 'mock_1',
+          entity_type: 'event',
+          name: 'Cyberpunk Art Exhibition',
+          description: 'A futuristic digital art exhibition featuring local and international digital artists.',
+          address: '2-24-1 Shibuya, Tokyo',
+          latitude: 35.6580,
+          longitude: 139.7016,
+          vibe_tags: ['cyberpunk', 'digital', 'neon'],
+          sourceImage: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+        },
+        {
+          id: 'mock_2',
+          entity_type: 'restaurant',
+          name: 'Neon Ramen',
+          description: 'Late night ramen spot with a retro-futuristic aesthetic.',
+          address: '1-10-2 Dogenzaka, Shibuya, Tokyo',
+          latitude: 35.6595,
+          longitude: 139.6990,
+          vibe_tags: ['cozy', 'late-night', 'cyberpunk'],
+          sourceImage: 'https://images.unsplash.com/photo-1552611052-3ba9d73c6516?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+        },
+        {
+          id: 'mock_3',
+          entity_type: 'venue',
+          name: 'Womb Tokyo',
+          description: 'Legendary underground electronic music club.',
+          address: '2-16 Maruyamacho, Shibuya, Tokyo',
+          latitude: 35.6587,
+          longitude: 139.6953,
+          vibe_tags: ['underground', 'electronic', 'club'],
+          sourceImage: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+        }
+      ];
+      setEntities(mockData);
+      setCenter({ lat: 35.6580, lng: 139.7016 });
     }
   };
 
@@ -57,6 +96,20 @@ function App() {
     if (item.lat && item.lng) {
       setCenter({ lat: item.lat, lng: item.lng });
     }
+    const fullEntity = entities.find(e => (e.id || e.name) === item.id);
+    if (fullEntity) {
+      setSelectedEntity(fullEntity);
+    }
+  };
+
+  const handleMarkerClick = (id: string) => {
+    const fullEntity = entities.find(e => (e.id || e.name) === id);
+    if (fullEntity) {
+      if (fullEntity.latitude && fullEntity.longitude) {
+        setCenter({ lat: fullEntity.latitude, lng: fullEntity.longitude });
+      }
+      setSelectedEntity(fullEntity);
+    }
   };
 
   // 4. Transform entities for Map markers
@@ -83,8 +136,16 @@ function App() {
 
   return (
     <div className="app-container" style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
-      <div className="map-container" style={{ flex: 1, height: '100%' }}>
-        <MapDashboard markers={markers} center={center} />
+      <div className="map-container" style={{ flex: 1, height: '100%', position: 'relative' }}>
+        <MapDashboard 
+          markers={markers} 
+          center={center} 
+          onMarkerClick={handleMarkerClick}
+        />
+        <EntitySnackbar 
+          entity={selectedEntity} 
+          onClose={() => setSelectedEntity(null)} 
+        />
       </div>
       
       <div className="side-panel">
