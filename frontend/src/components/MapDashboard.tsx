@@ -33,7 +33,6 @@ const MapDashboard: React.FC<MapDashboardProps> = ({ markers, center, onMarkerCl
       <APIProvider apiKey={API_KEY}>
         <Map
           defaultCenter={{ lat: 35.6620, lng: 139.7038 }}
-          center={center}
           defaultZoom={15}
           gestureHandling={'greedy'}
           mapId="LOCAL_LENS_MAP_ID"
