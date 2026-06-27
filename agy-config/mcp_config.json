@@ -1,0 +1,75 @@
+{
+  "mcpServers": {
+    "brave-search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-brave-search"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "YOUR_BRAVE_API_KEY"
+      }
+    },
+    "cloudrun": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@google-cloud/cloud-run-mcp"
+      ]
+    },
+    "gemini-docs": {
+      "serverUrl": "https://gemini-api-docs-mcp.dev"
+    },
+    "google-cloud-firestore": {
+      "serverUrl": "https://firestore.googleapis.com/mcp",
+      "authProviderType": "google_credentials"
+    },
+    "google-cloud-logging": {
+      "serverUrl": "https://logging.googleapis.com/mcp",
+      "authProviderType": "google_credentials"
+    },
+    "google-cloud-monitoring": {
+      "serverUrl": "https://monitoring.googleapis.com/mcp",
+      "authProviderType": "google_credentials"
+    },
+    "google-cloud-pubsub": {
+      "serverUrl": "https://pubsub.googleapis.com/mcp",
+      "authProviderType": "google_credentials"
+    },
+    "google-cloud-resource-manager": {
+      "serverUrl": "https://cloudresourcemanager.googleapis.com/mcp",
+      "authProviderType": "google_credentials"
+    },
+    "google-developer-knowledge": {
+      "serverUrl": "https://developerknowledge.googleapis.com/mcp",
+      "authProviderType": "google_credentials"
+    },
+    "google-maps": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@cablate/mcp-google-map"
+      ],
+      "env": {
+        "GOOGLE_MAPS_API_KEY": "YOUR_GOOGLE_MAPS_API_KEY"
+      },
+      "disabled": true
+    },
+    "serena": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "ide-assistant",
+        "--open-web-dashboard",
+        "false",
+        "--enable-gui-log-window",
+        "false"
+      ],
+      "disabled": true
+    }
+  }
+}

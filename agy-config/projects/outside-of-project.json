@@ -1,0 +1,20 @@
+{
+  "id": "outside-of-project",
+  "name": "Outside of Project",
+  "permissionGrants": {
+    "permissionGrants": {
+      "allow": [
+        "command(find ~/Library/Application\\\\ Support -name \"\\*config\\*\\.json\" -maxdepth 3 2>/dev/null)",
+        "read_file(/Users/c3d/Library/Application Support/Claude/claude_desktop_config.json)",
+        "read_file(/Users/c3d/Library/Application Support/Claude-3p/claude_desktop_config.json)",
+        "command(env)",
+        "command(find /Users/c3d/\\.gemini -name \"\\*\\.json\" 2>/dev/null)",
+        "command(cat)",
+        "command(npm list -g --depth=0 2>/dev/null)",
+        "command(which)",
+        "command(node -v)",
+        "command(ls -la \"/Users/c3d/Library/Application Support/Antigravity/bin\" \"/Users/c3d/\\.gemini/antigravity/bin\" 2>/dev/null)"
+      ]
+    }
+  }
+}

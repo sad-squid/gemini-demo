@@ -1,0 +1,19 @@
+{
+  "userSettings": {
+    "browserJsExecutionPolicy": "BROWSER_JS_EXECUTION_POLICY_TURBO",
+    "gcpRegion": "global",
+    "globalPermissionGrants": {
+      "allow": [
+        "write_file(~/git/gemini-hackathon)",
+        "read_file(~/git/gemini-hackathon)",
+        "mcp(https://gemini-api-docs-mcp.dev)",
+        "command(\"/Users/c3d/Library/Application Support/Antigravity/bin/agy-node\")",
+        "command(ls)",
+        "command(find ~ -maxdepth 3 -name \"\\*mcp\\*\" 2\u003e/dev/null)",
+        "command(cat /Users/c3d/\\.claude/mcp-needs-auth-cache\\.json 2\u003e/dev/null)",
+        "command(ls -la /Users/c3d/git/gemini-hackathon 2\u003e/dev/null)"
+      ]
+    },
+    "remoteControlHostname": "c3ds-macbook-pro-local-rising-signal"
+  }
+}
