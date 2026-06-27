@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import MapDashboard from './components/MapDashboard';
 import UploadZone from './components/UploadZone';
-import PulseFeed, { FeedItem } from './components/PulseFeed';
+import PulseFeed, { type FeedItem } from './components/PulseFeed';
 
 function App() {
   const [entities, setEntities] = useState<any[]>([]);
