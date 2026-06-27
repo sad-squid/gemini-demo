@@ -27,7 +27,8 @@ def deploy_server_infra() -> str:
         "--region", region,
         "--platform", "managed",
         "--allow-unauthenticated",
-        f"--set-env-vars=ENV=production,PORT=8080,GOOGLE_GENAI_USE_VERTEXAI=1,GOOGLE_CLOUD_PROJECT={project_id},GOOGLE_CLOUD_LOCATION={region}"
+        "--quiet",
+        f"--set-env-vars=ENV=production,GOOGLE_GENAI_USE_VERTEXAI=1,GOOGLE_CLOUD_PROJECT={project_id},GOOGLE_CLOUD_LOCATION={region}"
     ]
     
     print(f"[Server Deploy] Executing: {' '.join(deploy_cmd)}")
