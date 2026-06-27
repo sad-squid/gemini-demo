@@ -1,0 +1,6 @@
+- Show loading indicator on event fetching
+- Make sure duplicate event uploads do not get uploaded as separate events but maybe an agent or the existing enrichment agent can just update the existing event data? probably will want a last updated field for this? 
+- there should be animations for expanding event detail
+- the overall UX is super nice already, but i'd like to make it feel more like a google product - maybe like google maps with a more whimsical hyperlocal feel 
+- when the user clicks the image to expand, maybe the right pane should collapse? - maybe it should always be collapsible, i.e. if the user is panning the map, collapse etc.
+- "Verified Spot Feed" should instead read "Event Feed" or something and should maybe have an expandable view that allows the user to filter via timestamp of the event via slider

@@ -178,10 +178,12 @@ const UploadZone: React.FC<UploadZoneProps> = ({ onUploadComplete }) => {
           >
             <UploadCloud size={24} />
           </motion.div>
-          <h3 className="upload-title">Snap & Build</h3>
-          <p className="upload-subtitle">
-            Drag and drop or click to upload a flyer/menu
-          </p>
+          <div className="upload-text">
+            <h3 className="upload-title">Snap & Build</h3>
+            <p className="upload-subtitle">
+              Drag and drop or click to upload a flyer/menu
+            </p>
+          </div>
         </>
       ) : (
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

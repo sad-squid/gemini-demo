@@ -133,6 +133,12 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-secondary);
 }
 
+.upload-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 /* Pulse Feed */
 .pulse-feed h2 {
   font-size: 20px;
@@ -199,13 +205,13 @@ h1, h2, h3, h4, h5, h6 {
   }
   
   .map-container {
-    height: 50vh;
+    height: 40vh;
     flex: none;
   }
   
   .side-panel {
     width: 100%;
-    height: 50vh;
+    height: 60vh;
     flex: 1;
     border-left: none;
     border-top: 1px solid var(--panel-border);
@@ -213,10 +219,51 @@ h1, h2, h3, h4, h5, h6 {
   }
   
   .panel-header {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
   
   .panel-header h1 {
-    font-size: 24px;
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+
+  .upload-zone {
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 16px;
+    text-align: left;
+  }
+  
+  .upload-text {
+    align-items: flex-start;
+  }
+  
+  .upload-icon-wrapper {
+    margin-bottom: 0;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+  
+  .upload-title {
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+  
+  .upload-subtitle {
+    font-size: 11px;
+  }
+
+  /* Compact layout when uploading on mobile */
+  .upload-zone:not(:has(.upload-text)) {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 16px;
   }
 }

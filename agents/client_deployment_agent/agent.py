@@ -21,14 +21,43 @@ def deploy_client(api_base_url: Optional[str] = None, google_maps_api_key: Optio
     root_dir = os.path.dirname(os.path.dirname(agent_dir))
     frontend_dir = os.path.join(root_dir, "frontend")
     
-    # 1. Build the Vite Frontend
+    # 1. Resolve secrets from Secret Manager as fallback
+    if not api_base_url:
+        try:
+            print("[Client Deploy] VITE_API_BASE_URL not explicitly provided. Querying GCP Secret Manager...")
+            secret_result = subprocess.run(
+                ["gcloud", "secrets", "versions", "access", "latest", "--secret=VITE_API_BASE_URL"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            api_base_url = secret_result.stdout.strip()
+            print("[Client Deploy] Successfully retrieved VITE_API_BASE_URL from Secret Manager.")
+        except Exception as e:
+            print(f"[Client Deploy] Warning: Could not retrieve VITE_API_BASE_URL from Secret Manager. Error: {e}")
+
+    if not google_maps_api_key:
+        try:
+            print("[Client Deploy] VITE_GOOGLE_MAPS_API_KEY not explicitly provided. Querying GCP Secret Manager...")
+            secret_result = subprocess.run(
+                ["gcloud", "secrets", "versions", "access", "latest", "--secret=VITE_GOOGLE_MAPS_API_KEY"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            google_maps_api_key = secret_result.stdout.strip()
+            print("[Client Deploy] Successfully retrieved VITE_GOOGLE_MAPS_API_KEY from Secret Manager.")
+        except Exception as e:
+            print(f"[Client Deploy] Warning: Could not retrieve VITE_GOOGLE_MAPS_API_KEY from Secret Manager. Error: {e}")
+
+    # 2. Build the Vite Frontend
     print(f"[Client Deploy] Compiling frontend at {frontend_dir}...")
     env = os.environ.copy()
     if api_base_url:
         env["VITE_API_BASE_URL"] = api_base_url.strip()
-        print(f"[Client Deploy] API Base URL configured: {api_base_url}")
+        print(f"[Client Deploy] API Base URL configured.")
     else:
-        print("[Client Deploy] No explicit API base URL provided. Building with relative paths.")
+        print("[Client Deploy] No API base URL provided. Building with relative paths.")
         
     if google_maps_api_key:
         env["VITE_GOOGLE_MAPS_API_KEY"] = google_maps_api_key.strip()
@@ -54,7 +83,7 @@ def deploy_client(api_base_url: Optional[str] = None, google_maps_api_key: Optio
         
     print("[Client Deploy] Frontend compilation succeeded.")
     
-    # 2. Deploy to Firebase Hosting
+    # 3. Deploy to Firebase Hosting
     project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "noted-fact-500702-h4")
     print(f"[Client Deploy] Deploying to Firebase Hosting project {project_id}...")
     
@@ -88,7 +117,7 @@ def deploy_client(api_base_url: Optional[str] = None, google_maps_api_key: Optio
         "vite_build_output": build_result.stdout[-500:] # include last 500 chars of build log
     }
     return json.dumps(success_report, indent=2)
-
+ 
 root_agent = Agent(
     model='gemini-2.5-flash',
     name='client_deployment_agent',
@@ -97,13 +126,11 @@ root_agent = Agent(
         "You are Local Lens's Client Deployment Agent.\n"
         "Your role is to build the latest client-side React code and deploy it to Firebase Hosting.\n\n"
         "When asked to deploy or redeploy the client/frontend:\n"
-        "1. Identify if the user provided an absolute API base URL (e.g. for the Cloud Run backend). "
-        "If they did, pass it to the deploy_client tool. If they did not, run deploy_client without arguments "
-        "so the frontend uses relative paths.\n"
-        "2. Call the deploy_client tool to compile and deploy.\n"
-        "3. Wait for the tool to finish, then summarize the build logs, confirm the successful deployment, "
+        "1. Simply call the deploy_client tool without arguments. The tool will automatically query GCP Secret Manager "
+        "to securely fetch and apply the VITE_API_BASE_URL and VITE_GOOGLE_MAPS_API_KEY environment variables.\n"
+        "2. Wait for the tool to finish, then summarize the build logs, confirm the successful deployment, "
         "and proudly present the resulting secure URLs (e.g., https://noted-fact-500702-h4.web.app).\n"
-        "4. Maintain a professional, prompt, and helpful dev-ops engineer persona."
+        "3. Maintain a professional, prompt, and helpful dev-ops engineer persona."
     ),
     tools=[deploy_client],
 )
