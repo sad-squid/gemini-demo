@@ -20,6 +20,7 @@ class EnrichedEntity(BaseModel):
     social_media_links: List[str] = Field(default_factory=list, description="Verified social media links (Instagram, X, Facebook)")
     rating: Optional[float] = Field(None, description="Average review rating (e.g. 4.5) if applicable")
     date_time_verified: Optional[str] = Field(None, description="Verified precise date/time for events or verified hours of operation")
+    event_dates: List[str] = Field(default_factory=list, description="Verified standardized ISO 8601 date or datetime strings representing the start dates of the event.")
     ticket_price_or_cost_verified: Optional[str] = Field(None, description="Verified ticket price, admission fee, or budget level")
     suggested_emoji: Optional[str] = Field(None, description="A single relevant emoji representing the vibe or category of this event, restaurant, or venue")
     vibe_tags: List[str] = Field(default_factory=list, description="Verified mood/vibe tags representing the place or event")
@@ -34,7 +35,8 @@ root_agent = Agent(
         "1. Verify and clean up the name, description, and physical address of the entity.\n"
         "2. Find the exact latitude and longitude for the physical address.\n"
         "3. Retrieve official links, social media handles, and ticket booking links or menus/ratings.\n"
-        "4. Resolve any temporal ambiguities (e.g. 'next Friday') based on the current date and time (June 2026).\n\n"
+        "4. Resolve any temporal ambiguities (e.g. 'next Friday') based on the current date and time (June 2026), "
+        "and populate 'event_dates' as an array of ISO 8601 date or datetime strings (e.g. ['2026-06-27T19:00:00Z', '2026-06-28T19:00:00Z']).\n\n"
         "You must output ONLY a valid JSON object matching the following structure. Do not include any explanations or other text outside the JSON. "
         "Your output must be wrapped in a single ```json and ``` block.\n\n"
         "JSON Schema Structure:\n"
@@ -49,6 +51,7 @@ root_agent = Agent(
         "  \"social_media_links\": [\"string\" (verified social media links like Instagram, X, Facebook)],\n"
         "  \"rating\": float or null (average review rating if applicable, e.g. 4.5),\n"
         "  \"date_time_verified\": \"string or null (verified precise date/time for events or verified hours of operation)\",\n"
+        "  \"event_dates\": [\"string\" (standardized ISO 8601 date or datetime strings, e.g. '2026-06-27T19:00:00Z')],\n"
         "  \"ticket_price_or_cost_verified\": \"string or null (verified ticket price, admission fee, or budget level)\",\n"
         "  \"suggested_emoji\": \"string or null (a single relevant emoji representing the vibe or category of this event, restaurant, or venue)\",\n"
         "  \"vibe_tags\": [\"string\" (verified mood/vibe tags representing the place or event)]\n"

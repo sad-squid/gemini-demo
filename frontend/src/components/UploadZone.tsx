@@ -34,8 +34,20 @@ const UploadZone: React.FC<UploadZoneProps> = ({ onUploadComplete }) => {
   const [progress, setProgress] = useState(0);
   const [stageIndex, setStageIndex] = useState(0);
   const [tipIndex, setTipIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  // Responsive mobile width listener
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Manage timers during uploading
   useEffect(() => {
@@ -114,6 +126,9 @@ const UploadZone: React.FC<UploadZoneProps> = ({ onUploadComplete }) => {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+      if (cameraInputRef.current) {
+        cameraInputRef.current.value = '';
+      }
     }
   };
 
@@ -147,7 +162,7 @@ const UploadZone: React.FC<UploadZoneProps> = ({ onUploadComplete }) => {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      onClick={handleClick}
+      onClick={isMobile ? undefined : handleClick}
       style={{
         borderColor: isDragActive ? 'var(--accent-color)' : 'var(--panel-border)',
         background: isDragActive 
@@ -155,15 +170,22 @@ const UploadZone: React.FC<UploadZoneProps> = ({ onUploadComplete }) => {
           : isUploading 
             ? 'rgba(20, 20, 28, 0.4)' 
             : 'rgba(255, 255, 255, 0.02)',
-        cursor: isUploading ? 'default' : 'pointer',
+        cursor: (isUploading || isMobile) ? 'default' : 'pointer',
         boxShadow: isUploading ? 'inset 0 0 20px rgba(0, 0, 0, 0.2)' : 'none'
       }}
-      whileHover={!isUploading ? { scale: 1.02 } : {}}
-      whileTap={!isUploading ? { scale: 0.98 } : {}}
+      whileHover={(!isUploading && !isMobile) ? { scale: 1.02 } : {}}
+      whileTap={(!isUploading && !isMobile) ? { scale: 0.98 } : {}}
     >
       <input 
         type="file" 
         ref={fileInputRef} 
+        onChange={handleFileChange} 
+        style={{ display: 'none' }} 
+        accept="image/*"
+      />
+      <input 
+        type="file" 
+        ref={cameraInputRef} 
         onChange={handleFileChange} 
         style={{ display: 'none' }} 
         accept="image/*"
@@ -172,18 +194,122 @@ const UploadZone: React.FC<UploadZoneProps> = ({ onUploadComplete }) => {
       
       {!isUploading ? (
         <>
-          <motion.div 
-            className="upload-icon-wrapper"
-            animate={{ y: isDragActive ? -5 : 0 }}
-          >
-            <UploadCloud size={24} />
-          </motion.div>
-          <div className="upload-text">
-            <h3 className="upload-title">Snap & Build</h3>
-            <p className="upload-subtitle">
-              Drag and drop or click to upload a flyer/menu
-            </p>
-          </div>
+          {isMobile ? (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              gap: '12px'
+            }}>
+              {/* Top Row: Icon and Text side-by-side */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: '12px',
+                width: '100%'
+              }}>
+                <div className="upload-icon-wrapper" style={{ margin: 0, width: '36px', height: '36px', flexShrink: 0 }}>
+                  <UploadCloud size={18} style={{ color: 'var(--accent-color, #7b61ff)' }} />
+                </div>
+                <div className="upload-text" style={{ alignItems: 'flex-start' }}>
+                  <h3 className="upload-title" style={{ fontSize: '15px', margin: 0, fontWeight: 600 }}>Ingest Visual Context</h3>
+                  <p className="upload-subtitle" style={{ fontSize: '11px', margin: '2px 0 0 0' }}>
+                    Select a menu or flyer photo to map it with AI
+                  </p>
+                </div>
+              </div>
+
+              {/* Bottom Row: Action Buttons stacked full width */}
+              <div 
+                style={{ 
+                  display: 'flex', 
+                  gap: '12px', 
+                  width: '100%', 
+                  zIndex: 10
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Camera Snap action */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    cameraInputRef.current?.click();
+                  }}
+                  style={{
+                    flex: 1,
+                    background: 'linear-gradient(135deg, #7b61ff 0%, #6366f1 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 15px rgba(123, 97, 255, 0.35)',
+                    transition: 'transform 0.15s, opacity 0.15s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  📸 Snap Photo
+                </button>
+
+                {/* Photo Gallery action */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
+                  style={{
+                    flex: 1,
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    color: '#fff',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+                  }}
+                >
+                  🖼️ Gallery
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <motion.div 
+                className="upload-icon-wrapper"
+                animate={{ y: isDragActive ? -5 : 0 }}
+              >
+                <UploadCloud size={24} style={{ color: 'var(--accent-color, #7b61ff)' }} />
+              </motion.div>
+              <div className="upload-text">
+                <h3 className="upload-title">Ingest Visual Context</h3>
+                <p className="upload-subtitle">
+                  Drag and drop or click to upload a flyer/menu
+                </p>
+              </div>
+            </>
+          )}
         </>
       ) : (
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

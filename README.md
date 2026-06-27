@@ -2,6 +2,25 @@
 
 Welcome to the **Local Lens** codebase! This repository is built for the **Gemini AI Tokyo Hackathon 2026**. Local Lens is a hyper-localized context builder that turns user-submitted photos (like flyers, concert posters, and menus) into beautifully structured, geolocated map entities using Google Cloud Storage, Gemini AI Multimodal Ingestion, and autonomous ADK Search Grounding agents.
 
+## 🚀 Key Features & Capabilities
+
+* **📸 Multimodal Mobile-First Ingestion**:
+  * Desktop supports seamless drag-and-drop or file uploads.
+  * Mobile features dedicated, intuitive **📸 Snap Photo** (direct-to-camera native capture using `capture="environment"`) and **🖼️ Photo Gallery** inputs to eliminate friction.
+* **🗺️ Interactive Google Maps Dashboard**:
+  * Displays dynamic styled markers categorized by type (event, restaurant, general spot).
+  * Integrates a real-time **My Location** re-centering button with browser Geolocation APIs and a custom animated pulsing radar indicator.
+* **🧠 Intelligent Gemini & ADK Ingest Engine**:
+  * Leverages **Gemini 2.5 Flash** for multimodal visual layout parsing and metadata extraction.
+  * Integrates with an **Active Search Grounding Agent** to automatically verify coordinates, resolve street addresses, and enrich social links.
+* **📱 Premium Responsive Layout & Mobile Bottom Sheet**:
+  * Bottom sheet collapses dynamically to a compact `60px` header or expands smoothly to `55vh` with fluid spring transitions.
+  * Side panel and upload components use `flex-shrink: 0` to prevent vertical compression on smaller viewports.
+  * Adaptive layout keeps floating buttons isolated (e.g., panel toggle sits on the bottom-left to prevent overlapping the bottom-right map controls).
+* **📅 Accurate Active/Expired Status Engine**:
+  * Employs standard ISO timestamp arrays for events to accurately track active vs. expired status.
+  * Renders vibrant, visually stunning status badges on the UI.
+
 This guide clarifies the project's layout, detailing what each directory and file does to help you navigate the system.
 
 ---

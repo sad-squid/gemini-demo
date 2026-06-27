@@ -29,6 +29,10 @@ class ExtractedEntity(BaseModel):
         None, 
         description="Specific date and time for events, or opening hours for restaurants"
     )
+    event_dates: Optional[List[str]] = Field(
+        default_factory=list, 
+        description="Standardized ISO 8601 date strings or ISO 8601 datetime strings (e.g., YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS) representing the dates of the event."
+    )
     ticket_price_or_cost: Optional[str] = Field(
         None, 
         description="Ticket pricing/admission fee or average dining cost/budget info"

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from 'lucide-react';
 import MapDashboard from './components/MapDashboard';
 import UploadZone from './components/UploadZone';
-import PulseFeed, { type FeedItem } from './components/PulseFeed';
+import PulseFeed, { type FeedItem, isEventExpired } from './components/PulseFeed';
 import EntitySnackbar from './components/EntitySnackbar';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -14,6 +14,16 @@ function App() {
   const [selectedEntity, setSelectedEntity] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSidePanelCollapsed, setIsSidePanelCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // 1. Fetch initial spots from DB on load
   const fetchLocations = async () => {
@@ -125,7 +135,8 @@ function App() {
       lng: e.longitude,
       title: e.name,
       type: e.entity_type,
-      suggested_emoji: e.suggested_emoji
+      suggested_emoji: e.suggested_emoji,
+      isExpired: e.entity_type === 'event' && isEventExpired(e.date_time_verified || e.date_time, e.event_dates)
     }));
 
   // 5. Transform entities for Spot list items
@@ -136,17 +147,38 @@ function App() {
     tags: [e.entity_type, ...(e.vibe_tags || [])],
     lat: e.latitude,
     lng: e.longitude,
-    sourceImage: e.sourceImage
+    sourceImage: e.sourceImage,
+    date_time: e.date_time_verified || e.date_time,
+    event_dates: e.event_dates || []
   }));
 
   return (
-    <div className="app-container" style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', position: 'relative' }}>
+    <div className="app-container" style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', height: '100vh', width: '100vw', overflow: 'hidden', position: 'relative' }}>
       
       {/* Point 5: Floating Toggle Button for Side Panel (Google Maps Style) */}
       <button
         onClick={() => setIsSidePanelCollapsed(!isSidePanelCollapsed)}
         aria-label={isSidePanelCollapsed ? "Expand side panel" : "Collapse side panel"}
-        style={{
+        style={isMobile ? {
+          position: 'absolute',
+          bottom: isSidePanelCollapsed ? '84px' : 'calc(55vh + 24px)',
+          left: '16px',
+          zIndex: 101,
+          background: 'rgba(15, 15, 22, 0.85)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '12px',
+          width: '40px',
+          height: '40px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          cursor: 'pointer',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+          transition: 'bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.2s',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)'
+        } : {
           position: 'absolute',
           top: '24px',
           right: isSidePanelCollapsed ? '24px' : '444px',
@@ -169,15 +201,22 @@ function App() {
         onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
         onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(15, 15, 22, 0.85)'}
       >
-        {isSidePanelCollapsed ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+        {isMobile ? (
+          isSidePanelCollapsed ? <ChevronUp size={20} /> : <ChevronDown size={20} />
+        ) : (
+          isSidePanelCollapsed ? <ChevronLeft size={20} /> : <ChevronRight size={20} />
+        )}
       </button>
 
-      <div className="map-container" style={{ flex: 1, height: '100%', position: 'relative' }}>
+      <div className="map-container" style={{ flex: 1, height: isMobile ? 'auto' : '100%', position: 'relative' }}>
         <MapDashboard 
           markers={markers} 
           center={center} 
           onMarkerClick={handleMarkerClick}
-          onMapPan={() => setIsSidePanelCollapsed(true)} // Point 5: Auto-collapse on map drag/pan
+          onMapPan={() => {
+            setIsSidePanelCollapsed(true); // Auto-collapse side panel on map drag/pan
+            setSelectedEntity(null);       // Close/collapse bottom details sheet on map drag/pan
+          }}
         />
         <EntitySnackbar 
           entity={selectedEntity} 
@@ -199,49 +238,92 @@ function App() {
       
       {/* Point 5: Collapsible Animated Side Panel */}
       <motion.div 
-        animate={{ 
-          width: isSidePanelCollapsed ? 0 : 420, 
-          padding: isSidePanelCollapsed ? 0 : 24, 
-          opacity: isSidePanelCollapsed ? 0 : 1 
+        animate={isMobile ? {
+          height: isSidePanelCollapsed ? 60 : '55vh',
+          width: '100%',
+          padding: isSidePanelCollapsed ? '12px 16px' : '20px 16px',
+          opacity: 1
+        } : {
+          width: isSidePanelCollapsed ? 0 : 420,
+          padding: isSidePanelCollapsed ? 0 : 24,
+          opacity: isSidePanelCollapsed ? 0 : 1,
+          height: '100%'
         }}
         transition={{ type: 'spring', stiffness: 240, damping: 26 }}
         className="side-panel"
+        onClick={() => {
+          if (isMobile && isSidePanelCollapsed) {
+            setIsSidePanelCollapsed(false);
+          }
+        }}
         style={{ 
           overflow: 'hidden', 
           display: 'flex', 
           flexDirection: 'column',
-          height: '100%',
           background: 'rgba(20, 20, 28, 0.85)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
-          boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+          borderLeft: isMobile ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
+          borderTop: isMobile ? '1px solid rgba(255, 255, 255, 0.08)' : 'none',
+          boxShadow: '0 -8px 32px 0 rgba(0, 0, 0, 0.37)'
         }}
       >
+        {isMobile && (
+          <div style={{
+            width: '36px',
+            height: '4px',
+            background: 'rgba(255, 255, 255, 0.2)',
+            borderRadius: '2px',
+            margin: '0 auto 8px auto',
+            cursor: 'pointer',
+            flexShrink: 0
+          }} />
+        )}
         {/* Point 4: Google Whimsical Style Logo and Indicators */}
-        <div className="panel-header" style={{ position: 'relative' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <div style={{
-              display: 'flex',
-              gap: '3px',
-              padding: '4px 6px',
-              background: 'rgba(255,255,255,0.05)',
-              borderRadius: '50px'
-            }}>
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4285F4' }} />
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34A853' }} />
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#FBBC05' }} />
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#EA4335' }} />
+        <div className="panel-header" style={{ position: 'relative', marginBottom: isMobile && isSidePanelCollapsed ? 0 : undefined }}>
+          {!(isMobile && isSidePanelCollapsed) && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <div style={{
+                display: 'flex',
+                gap: '3px',
+                padding: '4px 6px',
+                background: 'rgba(255,255,255,0.05)',
+                borderRadius: '50px'
+              }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4285F4' }} />
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34A853' }} />
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#FBBC05' }} />
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#EA4335' }} />
+              </div>
+              <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--success-color, #00d2ff)', fontWeight: 700 }}>
+                Hyperlocal Engine
+              </span>
             </div>
-            <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--success-color, #00d2ff)', fontWeight: 700 }}>
-              Hyperlocal Engine
-            </span>
-          </div>
-          <h1 style={{ fontSize: '28px', background: 'linear-gradient(135deg, #fff 0%, #a594fd 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: '0 0 4px 0' }}>Local Lens</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '13px', margin: 0 }}>Tokyo active AI-guided mapping engine</p>
+          )}
+          <h1 style={{ 
+            fontSize: isMobile && isSidePanelCollapsed ? '18px' : '28px', 
+            background: 'linear-gradient(135deg, #fff 0%, #a594fd 100%)', 
+            WebkitBackgroundClip: 'text', 
+            WebkitTextFillColor: 'transparent', 
+            margin: '0',
+            textAlign: isMobile && isSidePanelCollapsed ? 'center' : 'left'
+          }}>
+            Local Lens
+          </h1>
+          {!(isMobile && isSidePanelCollapsed) && (
+            <p style={{ color: 'var(--text-secondary)', fontSize: '13px', margin: '4px 0 0 0' }}>Tokyo active AI-guided mapping engine</p>
+          )}
         </div>
 
-         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto', marginTop: '16px' }}>
+         <div style={{ 
+           display: 'flex', 
+           flexDirection: 'column', 
+           flex: 1, 
+           overflowY: 'auto', 
+           marginTop: '16px',
+           minHeight: 0,
+           WebkitOverflowScrolling: 'touch'
+         }}>
            <UploadZone onUploadComplete={handleUploadComplete} />
            <PulseFeed items={feedItems} onItemClick={handleItemClick} isLoading={isLoading} />
          </div>

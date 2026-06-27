@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Globe, Share2, ExternalLink, ChevronDown, ChevronUp, Maximize2, Sparkles } from 'lucide-react';
+import { isEventExpired } from './PulseFeed';
 
 interface EntitySnackbarProps {
   entity: any | null;
@@ -17,9 +18,21 @@ const EntitySnackbar: React.FC<EntitySnackbarProps> = ({
   onSelectEntity,
   onLightboxToggle
 }) => {
+  const isExpired = entity && entity.entity_type === 'event' && isEventExpired(entity.date_time_verified || entity.date_time, entity.event_dates);
   const [isExpanded, setIsExpanded] = useState(false);
   const [posterAspect, setPosterAspect] = useState<'horizontal' | 'vertical'>('horizontal');
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Responsive mobile width listener
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Reset expansion state and layout state when selected entity changes
   useEffect(() => {
@@ -73,6 +86,27 @@ const EntitySnackbar: React.FC<EntitySnackbarProps> = ({
     <AnimatePresence>
       {entity && (
         <>
+          {/* Glassmorphic Backdrop overlay on mobile for focus and easy light-dismiss */}
+          {isMobile && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onClose}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                background: 'rgba(5, 5, 8, 0.45)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)',
+                zIndex: 999
+              }}
+            />
+          )}
+
           {/* Main Bottom Sheet Panel */}
           <motion.div
             initial={{ y: "100%", opacity: 0 }}
@@ -80,33 +114,47 @@ const EntitySnackbar: React.FC<EntitySnackbarProps> = ({
             exit={{ y: "100%", opacity: 0 }}
             transition={{ type: "spring", stiffness: 280, damping: 28 }}
             style={{
-              position: 'absolute',
+              position: isMobile ? 'fixed' : 'absolute',
               bottom: 0,
               left: 0,
               width: '100%',
-              maxHeight: '82vh',
-              background: 'rgba(15, 15, 22, 0.95)',
-              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              maxHeight: isMobile ? '85vh' : '82vh',
+              background: 'rgba(15, 15, 22, 0.96)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '24px 24px 0 0',
-              boxShadow: '0 -15px 40px rgba(0,0,0,0.7)',
+              boxShadow: '0 -15px 40px rgba(0,0,0,0.8)',
               zIndex: 1000,
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)'
+              backdropFilter: 'blur(25px)',
+              WebkitBackdropFilter: 'blur(25px)'
             }}
           >
+            {/* Native-like Grab / Pull handle for mobile sheets */}
+            {isMobile && (
+              <div style={{
+                width: '40px',
+                height: '4px',
+                background: 'rgba(255, 255, 255, 0.25)',
+                borderRadius: '2px',
+                margin: '12px auto 4px auto',
+                flexShrink: 0
+              }} />
+            )}
+
             {/* Top Close Button for the panel */}
             <button 
               onClick={onClose}
               aria-label="Close details panel"
               style={{
                 position: 'absolute',
-                top: '16px',
-                right: '16px',
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                top: isMobile ? '12px' : '16px',
+                right: isMobile ? '12px' : '16px',
+                background: 'rgba(15, 15, 22, 0.7)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
                 borderRadius: '50%',
                 width: '36px',
                 height: '36px',
@@ -116,10 +164,11 @@ const EntitySnackbar: React.FC<EntitySnackbarProps> = ({
                 color: 'var(--text-primary, #f0f0f5)',
                 cursor: 'pointer',
                 zIndex: 1010,
-                transition: 'all 0.2s'
+                transition: 'all 0.2s',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(15, 15, 22, 0.7)'}
             >
               <X size={18} />
             </button>
@@ -127,10 +176,13 @@ const EntitySnackbar: React.FC<EntitySnackbarProps> = ({
             {/* Split Content layout (Horizontal vs Vertical) (Point 2) */}
             <div style={{ 
               display: 'flex', 
-              flexDirection: posterAspect === 'vertical' ? 'row' : 'column',
+              flexDirection: isMobile ? 'column' : (posterAspect === 'vertical' ? 'row' : 'column'),
               width: '100%',
-              height: '100%',
-              overflowY: 'auto'
+              flex: 1,
+              minHeight: 0,
+              overflowY: isMobile ? 'auto' : (posterAspect === 'vertical' ? 'hidden' : 'auto'),
+              overscrollBehaviorY: 'contain',
+              WebkitOverflowScrolling: 'touch'
             }}>
               
               {/* Poster Image Area */}
@@ -140,9 +192,10 @@ const EntitySnackbar: React.FC<EntitySnackbarProps> = ({
                   style={{ 
                     position: 'relative', 
                     cursor: 'zoom-in',
-                    width: posterAspect === 'vertical' ? '220px' : '100%', 
-                    height: posterAspect === 'vertical' ? 'auto' : '190px',
-                    minHeight: posterAspect === 'vertical' ? '300px' : '190px',
+                    width: isMobile ? '100%' : (posterAspect === 'vertical' ? '220px' : '100%'), 
+                    height: isMobile ? '240px' : (posterAspect === 'vertical' ? 'auto' : '190px'),
+                    minHeight: isMobile ? 'auto' : (posterAspect === 'vertical' ? '300px' : '190px'),
+                    maxHeight: isMobile ? '35vh' : 'none',
                     flexShrink: 0,
                     background: '#14141d',
                     overflow: 'hidden',
@@ -157,10 +210,46 @@ const EntitySnackbar: React.FC<EntitySnackbarProps> = ({
                       width: '100%', 
                       height: '100%', 
                       objectFit: 'cover',
-                      display: 'block'
+                      display: 'block',
+                      filter: isExpired ? 'grayscale(0.8) opacity(0.55)' : 'none',
+                      transition: 'filter 0.3s ease'
                     }}
                   />
                   
+                  {/* Past Event Overlay Badge */}
+                  {isExpired && (
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: 'rgba(15, 15, 22, 0.45)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      pointerEvents: 'none'
+                    }}>
+                      <div style={{
+                        background: 'rgba(239, 68, 68, 0.9)',
+                        color: 'white',
+                        padding: '6px 14px',
+                        borderRadius: '20px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                        backdropFilter: 'blur(4px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}>
+                        <span style={{ fontSize: '12px' }}>⏰</span> Past Event
+                      </div>
+                    </div>
+                  )}
+
                   {/* Subtle Zoom/Expand hover hint */}
                   <div style={{
                     position: 'absolute',
@@ -185,14 +274,15 @@ const EntitySnackbar: React.FC<EntitySnackbarProps> = ({
               {/* Information & Description Details Column */}
               <div style={{ 
                 flex: 1, 
-                padding: '24px 24px 32px 24px', 
+                padding: isMobile ? '20px 16px 32px 16px' : '24px 24px 32px 24px', 
                 display: 'flex', 
                 flexDirection: 'column', 
-                overflowY: 'auto'
+                overflowY: isMobile ? 'visible' : (posterAspect === 'vertical' ? 'auto' : 'visible'),
+                minHeight: 0
               }}>
                 
                 {/* Header Title Section */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', paddingRight: '40px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', paddingRight: '40px', flexWrap: 'wrap' }}>
                   <span style={{ 
                     background: entity.entity_type === 'event' ? 'var(--accent-color, #7b61ff)' : (entity.entity_type === 'restaurant' ? '#10b981' : '#00d2ff'), 
                     color: 'white', 
@@ -209,17 +299,59 @@ const EntitySnackbar: React.FC<EntitySnackbarProps> = ({
                     {entity.suggested_emoji || (entity.entity_type === 'event' ? '🎫' : (entity.entity_type === 'restaurant' ? '🍜' : '📍'))}
                     {entity.entity_type || 'spot'}
                   </span>
-                  <h3 style={{ margin: 0, fontSize: '22px', color: 'var(--text-primary, #fff)', fontWeight: 700 }}>
+
+                  {isExpired && (
+                    <span style={{ 
+                      background: 'rgba(239, 68, 68, 0.15)', 
+                      border: '1px solid rgba(239, 68, 68, 0.3)',
+                      color: '#f87171', 
+                      padding: '3px 10px', 
+                      borderRadius: '12px', 
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      Expired
+                    </span>
+                  )}
+
+                  <h3 style={{ margin: 0, fontSize: isMobile ? '20px' : '22px', color: 'var(--text-primary, #fff)', fontWeight: 700, lineHeight: 1.25 }}>
                     {entity.name}
                   </h3>
                 </div>
+
+                {/* Expired alert banner */}
+                {isExpired && (
+                  <div style={{
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    borderRadius: '16px',
+                    padding: '12px 16px',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                  }}>
+                    <span style={{ fontSize: '18px' }}>⏰</span>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: '#f87171' }}>This event has ended</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary, #b3b3b3)' }}>
+                        This listing is kept for reference as a past hotspot.
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 {/* 1. Labeled Metadata Sections Above Description (Point 1 - Clarity & a11y) */}
                 <div 
                   aria-label="Spot Details"
                   style={{ 
                     display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(220px, 1fr))', 
                     gap: '12px', 
                     marginBottom: '20px',
                     background: 'rgba(255, 255, 255, 0.02)',
