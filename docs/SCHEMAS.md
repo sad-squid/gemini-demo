@@ -10,27 +10,22 @@ Every parsed real-world entity is represented as a `GeoEntity`.
 ```typescript
 type EntityType = 'event' | 'venue' | 'restaurant';
 
-interface GeoEntity {
-  id: string;                      // Unique ID (UUID or slug)
-  type: EntityType;                // Category of entity
-  name: string;                    // Name of the event, restaurant, or venue
-  description: string;             // Detailed description / extracted text summary
-  location: {
-    address: string;               // Text address (e.g. "1-2-3 Shibuya, Tokyo")
-    coordinates?: {                // Filled by Agentic Enricher (Track 3)
-      latitude: number;
-      longitude: number;
-    };
-  };
-  contact?: {
-    website?: string;              // Extracted or found official URL
-    phone?: string;
-    instagram?: string;            // Social handles (Enricher or Extracted)
-  };
-  metadata: EventMetadata | VenueMetadata | RestaurantMetadata;
-  tags: string[];                  // Aesthetic / category vibe tags (e.g., ["jazz", "cozy", "neon"])
-  sourceImage: string;             // URL or local file path to the source photo
-  createdAt: string;               // ISO 8601 Timestamp
+interface EnrichedEntity {
+  id?: string;                                // Unique ID (UUID or slug)
+  entity_type: EntityType;                    // Category of entity
+  name: string;                               // Name of the event, restaurant, or venue
+  description: string;                        // Enriched description incorporating verified details and context
+  address: string;                            // Verified, precise physical address or location
+  latitude: number;                           // Latitude coordinate
+  longitude: number;                          // Longitude coordinate
+  official_website?: string;                  // Verified official website or booking/ticket URL
+  social_media_links?: string[];              // Verified social media links (Instagram, X, Facebook)
+  rating?: number;                            // Average review rating if applicable
+  date_time_verified?: string;                // Verified precise date/time for events or hours of operation
+  ticket_price_or_cost_verified?: string;     // Verified ticket price, admission fee, or budget level
+  vibe_tags: string[];                        // Verified mood/vibe tags
+  sourceImage?: string;                       // URL to the source photo in Cloud Storage
+  createdAt?: string;                         // ISO 8601 Timestamp
 }
 ```
 

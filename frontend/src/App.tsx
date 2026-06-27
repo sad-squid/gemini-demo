@@ -63,7 +63,7 @@ function App() {
   const markers = entities
     .filter(e => e.latitude && e.longitude)
     .map(e => ({
-      id: e.name,
+      id: e.id || e.name,
       lat: e.latitude,
       lng: e.longitude,
       title: e.name,
@@ -72,12 +72,13 @@ function App() {
 
   // 5. Transform entities for Spot list items
   const feedItems: FeedItem[] = entities.map(e => ({
-    id: e.name,
+    id: e.id || e.name,
     title: e.name,
     location: e.address || 'Tokyo, Japan',
     tags: [e.entity_type, ...(e.vibe_tags || [])],
     lat: e.latitude,
-    lng: e.longitude
+    lng: e.longitude,
+    sourceImage: e.sourceImage
   }));
 
   return (

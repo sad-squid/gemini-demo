@@ -57,6 +57,7 @@ def add_entity(entity: Dict[str, Any]) -> bool:
             doc_id = entity.get("name", "").lower().replace(" ", "_")
             if not doc_id:
                 doc_id = "entity_" + str(len(list(client.collection("entities").stream())))
+            entity["id"] = doc_id
             client.collection("entities").document(doc_id).set(entity)
             return True
         except Exception as e:
@@ -66,6 +67,10 @@ def add_entity(entity: Dict[str, Any]) -> bool:
     data = load_local_db()
     # Check for duplicate
     data = [item for item in data if item.get("name") != entity.get("name")]
+    
+    if "id" not in entity:
+        entity["id"] = entity.get("name", "").lower().replace(" ", "_") or f"entity_{len(data)}"
+        
     data.append(entity)
     return save_local_db(data)
 

@@ -53,4 +53,5 @@ root_agent = Agent(
         "}"
     ),
     tools=[GoogleSearchTool()],
+    output_schema=EnrichedEntity,
 )

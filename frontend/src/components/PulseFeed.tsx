@@ -8,6 +8,7 @@ export interface FeedItem {
   tags: string[];
   lat?: number;
   lng?: number;
+  sourceImage?: string;
 }
 
 interface PulseFeedProps {
@@ -58,10 +59,15 @@ const PulseFeed: React.FC<PulseFeedProps> = ({ items, onItemClick }) => {
                   color: 'white',
                   fontSize: '18px',
                   fontWeight: 'bold',
-                  fontFamily: 'Outfit, sans-serif'
+                  fontFamily: 'Outfit, sans-serif',
+                  overflow: 'hidden'
                 }}
               >
-                {item.title.charAt(0)}
+                {item.sourceImage ? (
+                  <img src={item.sourceImage} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  item.title.charAt(0)
+                )}
               </div>
               <div className="feed-content" style={{ flex: 1, minWidth: 0 }}>
                 <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'white', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</h3>
