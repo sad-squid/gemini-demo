@@ -16,6 +16,7 @@ interface MapDashboardProps {
   markers: MarkerData[];
   center: { lat: number; lng: number };
   onMarkerClick?: (id: string) => void;
+  onMapPan?: () => void;
 }
 
 const MapUpdater: React.FC<{ center: {lat: number, lng: number} }> = ({ center }) => {
@@ -28,7 +29,7 @@ const MapUpdater: React.FC<{ center: {lat: number, lng: number} }> = ({ center }
   return null;
 };
 
-const MapDashboard: React.FC<MapDashboardProps> = ({ markers, center, onMarkerClick }) => {
+const MapDashboard: React.FC<MapDashboardProps> = ({ markers, center, onMarkerClick, onMapPan }) => {
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <APIProvider apiKey={API_KEY}>
@@ -39,6 +40,7 @@ const MapDashboard: React.FC<MapDashboardProps> = ({ markers, center, onMarkerCl
           mapId="LOCAL_LENS_MAP_ID"
           disableDefaultUI={false}
           style={{ width: '100%', height: '100%' }}
+          onDragstart={onMapPan}
         >
           <MapUpdater center={center} />
           {markers.map((marker) => (

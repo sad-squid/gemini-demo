@@ -7,13 +7,15 @@ interface EntitySnackbarProps {
   onClose: () => void;
   entities?: any[];
   onSelectEntity?: (entity: any) => void;
+  onLightboxToggle?: (isOpen: boolean) => void;
 }
 
 const EntitySnackbar: React.FC<EntitySnackbarProps> = ({ 
   entity, 
   onClose, 
   entities = [], 
-  onSelectEntity 
+  onSelectEntity,
+  onLightboxToggle
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [posterAspect, setPosterAspect] = useState<'horizontal' | 'vertical'>('horizontal');
@@ -24,6 +26,13 @@ const EntitySnackbar: React.FC<EntitySnackbarProps> = ({
     setIsExpanded(false);
     setPosterAspect('horizontal'); // Default fallback
   }, [entity]);
+
+  // Trigger onLightboxToggle when lightbox state changes
+  useEffect(() => {
+    if (onLightboxToggle) {
+      onLightboxToggle(isLightboxOpen);
+    }
+  }, [isLightboxOpen, onLightboxToggle]);
 
   // Handle image dimensions to decide aspect split (Point 2)
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -340,19 +349,33 @@ const EntitySnackbar: React.FC<EntitySnackbarProps> = ({
                   )}
                 </div>
 
-                {/* Rich Description Panel */}
+                {/* Rich Description Panel with height animations (Point 3) */}
                 <div style={{ marginBottom: '20px' }}>
                   <span style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--accent-color, #7b61ff)', fontWeight: 700, letterSpacing: '0.05em', display: 'block', marginBottom: '6px' }}>
                     📖 Spot Context
                   </span>
-                  <p style={{ margin: '0 0 6px 0', fontSize: '14px', color: 'var(--text-secondary, #b3b3b3)', lineHeight: 1.5, textAlign: 'justify' }}>
-                    {isExpanded 
-                      ? entity.description 
-                      : (entity.description && entity.description.length > 64 
-                          ? `${entity.description.slice(0, 64)}...` 
-                          : entity.description)
-                    }
-                  </p>
+                  
+                  <motion.div
+                    animate={{ height: isExpanded ? 'auto' : '44px' }}
+                    transition={{ type: 'spring', stiffness: 220, damping: 22 }}
+                    style={{ overflow: 'hidden', position: 'relative' }}
+                  >
+                    <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary, #b3b3b3)', lineHeight: 1.5, textAlign: 'justify' }}>
+                      {entity.description}
+                    </p>
+                    {!isExpanded && entity.description && entity.description.length > 64 && (
+                      <div style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '24px',
+                        background: 'linear-gradient(to top, rgba(15, 15, 22, 0.95), transparent)',
+                        pointerEvents: 'none'
+                      }} />
+                    )}
+                  </motion.div>
+
                   {entity.description && entity.description.length > 64 && (
                     <button
                       onClick={() => setIsExpanded(!isExpanded)}
@@ -364,6 +387,7 @@ const EntitySnackbar: React.FC<EntitySnackbarProps> = ({
                         fontSize: '13px',
                         fontWeight: 700,
                         padding: 0,
+                        marginTop: '6px',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '4px'

@@ -50,6 +50,9 @@ def save_local_db(data: List[Dict[str, Any]]) -> bool:
 
 def add_entity(entity: Dict[str, Any]) -> bool:
     """Adds a new entity to Firestore or local JSON DB."""
+    import datetime
+    entity["last_updated"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+
     client = get_db_client()
     if client:
         try:

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import MapDashboard from './components/MapDashboard';
 import UploadZone from './components/UploadZone';
 import PulseFeed, { type FeedItem } from './components/PulseFeed';
@@ -10,9 +12,12 @@ function App() {
   const [entities, setEntities] = useState<any[]>([]);
   const [center, setCenter] = useState({ lat: 35.6620, lng: 139.7038 }); // Shibuya, Tokyo
   const [selectedEntity, setSelectedEntity] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSidePanelCollapsed, setIsSidePanelCollapsed] = useState(false);
 
   // 1. Fetch initial spots from DB on load
   const fetchLocations = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/locations`);
       const result = await response.json();
@@ -65,6 +70,8 @@ function App() {
       ];
       setEntities(mockData);
       setCenter({ lat: 35.6580, lng: 139.7016 });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -133,12 +140,44 @@ function App() {
   }));
 
   return (
-    <div className="app-container">
-      <div className="map-container">
+    <div className="app-container" style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', position: 'relative' }}>
+      
+      {/* Point 5: Floating Toggle Button for Side Panel (Google Maps Style) */}
+      <button
+        onClick={() => setIsSidePanelCollapsed(!isSidePanelCollapsed)}
+        aria-label={isSidePanelCollapsed ? "Expand side panel" : "Collapse side panel"}
+        style={{
+          position: 'absolute',
+          top: '24px',
+          right: isSidePanelCollapsed ? '24px' : '444px',
+          zIndex: 101,
+          background: 'rgba(15, 15, 22, 0.85)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '12px',
+          width: '40px',
+          height: '40px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          cursor: 'pointer',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+          transition: 'right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.2s',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+        onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(15, 15, 22, 0.85)'}
+      >
+        {isSidePanelCollapsed ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+      </button>
+
+      <div className="map-container" style={{ flex: 1, height: '100%', position: 'relative' }}>
         <MapDashboard 
           markers={markers} 
           center={center} 
           onMarkerClick={handleMarkerClick}
+          onMapPan={() => setIsSidePanelCollapsed(true)} // Point 5: Auto-collapse on map drag/pan
         />
         <EntitySnackbar 
           entity={selectedEntity} 
@@ -150,20 +189,63 @@ function App() {
             }
             setSelectedEntity(entity);
           }}
+          onLightboxToggle={(isOpen) => {
+            if (isOpen) {
+              setIsSidePanelCollapsed(true); // Point 5: Collapse side panel when poster zooms in
+            }
+          }}
         />
       </div>
       
-      <div className="side-panel">
-        <div className="panel-header">
-          <h1>Local Lens</h1>
-          <p>Tokyo active AI-guided mapping engine</p>
+      {/* Point 5: Collapsible Animated Side Panel */}
+      <motion.div 
+        animate={{ 
+          width: isSidePanelCollapsed ? 0 : 420, 
+          padding: isSidePanelCollapsed ? 0 : 24, 
+          opacity: isSidePanelCollapsed ? 0 : 1 
+        }}
+        transition={{ type: 'spring', stiffness: 240, damping: 26 }}
+        className="side-panel"
+        style={{ 
+          overflow: 'hidden', 
+          display: 'flex', 
+          flexDirection: 'column',
+          height: '100%',
+          background: 'rgba(20, 20, 28, 0.85)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+        }}
+      >
+        {/* Point 4: Google Whimsical Style Logo and Indicators */}
+        <div className="panel-header" style={{ position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <div style={{
+              display: 'flex',
+              gap: '3px',
+              padding: '4px 6px',
+              background: 'rgba(255,255,255,0.05)',
+              borderRadius: '50px'
+            }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4285F4' }} />
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34A853' }} />
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#FBBC05' }} />
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#EA4335' }} />
+            </div>
+            <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--success-color, #00d2ff)', fontWeight: 700 }}>
+              Hyperlocal Engine
+            </span>
+          </div>
+          <h1 style={{ fontSize: '28px', background: 'linear-gradient(135deg, #fff 0%, #a594fd 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: '0 0 4px 0' }}>Local Lens</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '13px', margin: 0 }}>Tokyo active AI-guided mapping engine</p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto' }}>
-          <UploadZone onUploadComplete={handleUploadComplete} />
-          <PulseFeed items={feedItems} onItemClick={handleItemClick} />
-        </div>
-      </div>
+         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto', marginTop: '16px' }}>
+           <UploadZone onUploadComplete={handleUploadComplete} />
+           <PulseFeed items={feedItems} onItemClick={handleItemClick} isLoading={isLoading} />
+         </div>
+      </motion.div>
     </div>
   );
 }

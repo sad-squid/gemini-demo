@@ -1,5 +1,5 @@
-import React from 'react';
-import { Activity } from 'lucide-react';
+import React, { useState } from 'react';
+import { Activity, SlidersHorizontal, Calendar, ChevronDown, ChevronUp, Clock, Info } from 'lucide-react';
 
 export interface FeedItem {
   id: string;
@@ -9,28 +9,205 @@ export interface FeedItem {
   lat?: number;
   lng?: number;
   sourceImage?: string;
+  date_time?: string;
 }
 
 interface PulseFeedProps {
   items: FeedItem[];
   onItemClick?: (item: FeedItem) => void;
+  isLoading?: boolean; // Point 1: Loading state indicator
 }
 
-const PulseFeed: React.FC<PulseFeedProps> = ({ items, onItemClick }) => {
+// Utility to parse dates and calculate estimated days from June 27, 2026 (User's context local time)
+const getDaysFromToday = (dateTimeStr?: string): number => {
+  if (!dateTimeStr) return 999; // Venues/Hours default to always visible
+  
+  const text = dateTimeStr.toLowerCase();
+  
+  if (text.includes('today') || text.includes('tonight')) return 0;
+  if (text.includes('tomorrow')) return 1;
+  
+  // Simple week day matching
+  const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const todayIndex = 6; // June 27, 2026 is Saturday
+  
+  for (let i = 0; i < 7; i++) {
+    if (text.includes(daysOfWeek[i])) {
+      const targetIndex = i;
+      let diff = targetIndex - todayIndex;
+      if (diff < 0) diff += 7;
+      return diff;
+    }
+  }
+  
+  // Month-day matching e.g. "July 12"
+  const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+  const shortMonths = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  
+  const todayDate = new Date('2026-06-27');
+  
+  for (let m = 0; m < 12; m++) {
+    if (text.includes(months[m]) || text.includes(shortMonths[m])) {
+      const numMatch = text.match(/\b\d{1,2}\b/);
+      if (numMatch) {
+        const day = parseInt(numMatch[0]);
+        const eventDate = new Date(2026, m, day);
+        const diffTime = eventDate.getTime() - todayDate.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays >= 0) return diffDays;
+      }
+    }
+  }
+  
+  return 999; // Fallback
+};
+
+const PulseFeed: React.FC<PulseFeedProps> = ({ items, onItemClick, isLoading = false }) => {
+  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+  const [maxDays, setMaxDays] = useState<number>(30); // 30 represents "Anytime"
+
+  // Filter items chronologically: Keep non-events visible, filter events based on slider
+  const filteredItems = items.filter(item => {
+    const isEvent = item.tags.includes('event');
+    if (!isEvent) return true; // Keep venues/restaurants always visible
+    
+    if (maxDays === 30) return true; // Anytime option
+    const daysAway = getDaysFromToday(item.date_time);
+    return daysAway <= maxDays;
+  });
+
+  const getFilterLabel = () => {
+    if (maxDays === 0) return 'Happening Today 📍';
+    if (maxDays === 1) return 'Happening by Tomorrow 🌅';
+    if (maxDays === 7) return 'Within the Next Week 📅';
+    if (maxDays === 14) return 'Within 2 Weeks 🗓️';
+    if (maxDays === 30) return 'Show Anytime ♾️';
+    return `Within next ${maxDays} days`;
+  };
+
   return (
-    <div className="pulse-feed" style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto' }}>
-      <h2 style={{ fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', color: 'white' }}>
-        <Activity size={16} style={{ color: 'var(--accent-color)' }} /> Verified Spot Feed
-      </h2>
+    <div className="pulse-feed" style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto', gap: '16px' }}>
       
-      <div className="feed-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {items.length === 0 ? (
+      {/* Header section (Renamed to Event Feed with a whimsy Maps touch) */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 style={{ fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px', margin: 0, color: 'white' }}>
+          <Activity size={18} style={{ color: 'var(--success-color, #00d2ff)' }} /> Event & Spot Feed
+        </h2>
+        
+        {/* Toggle Filter Panel */}
+        <button
+          onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+          style={{
+            background: isFilterExpanded ? 'rgba(0, 210, 255, 0.15)' : 'rgba(255,255,255,0.03)',
+            border: `1px solid ${isFilterExpanded ? 'rgba(0, 210, 255, 0.3)' : 'rgba(255,255,255,0.08)'}`,
+            borderRadius: '20px',
+            padding: '6px 12px',
+            fontSize: '12px',
+            fontWeight: 600,
+            color: isFilterExpanded ? 'var(--success-color, #00d2ff)' : 'var(--text-secondary)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <SlidersHorizontal size={13} />
+          <span>Timeline</span>
+          {isFilterExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+        </button>
+      </div>
+
+      {/* Expandable Date/Time Filter Slider Section (Point 6) */}
+      {isFilterExpanded && (
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.02)',
+          border: '1px solid rgba(255, 255, 255, 0.05)',
+          borderRadius: '16px',
+          padding: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Clock size={12} style={{ color: 'var(--success-color)' }} /> Chronological Filter
+            </span>
+            <span style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              background: 'rgba(0, 210, 255, 0.1)',
+              color: 'var(--success-color, #00d2ff)',
+              padding: '3px 8px',
+              borderRadius: '20px',
+              border: '1px solid rgba(0, 210, 255, 0.15)'
+            }}>
+              {getFilterLabel()}
+            </span>
+          </div>
+
+          <input 
+            type="range" 
+            min="0" 
+            max="30" 
+            step="1" 
+            value={maxDays}
+            onChange={(e) => setMaxDays(parseInt(e.target.value))}
+            style={{
+              width: '100%',
+              height: '6px',
+              borderRadius: '3px',
+              background: 'rgba(255,255,255,0.1)',
+              outline: 'none',
+              cursor: 'pointer',
+              accentColor: 'var(--success-color, #00d2ff)'
+            }}
+          />
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--text-secondary)', padding: '0 2px' }}>
+            <span>Today</span>
+            <span>1 Week</span>
+            <span>2 Weeks</span>
+            <span>Anytime</span>
+          </div>
+        </div>
+      )}
+
+      {/* Main list container */}
+      <div className="feed-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative' }}>
+        
+        {/* Point 1: Loading state indicator inside the feed */}
+        {isLoading ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 16px', gap: '12px' }}>
+            <div className="google-spinner" style={{
+              width: '32px',
+              height: '32px',
+              border: '3px solid rgba(255, 255, 255, 0.05)',
+              borderTop: '3px solid var(--success-color, #00d2ff)',
+              borderRadius: '50%',
+              animation: 'spin 0.8s linear infinite'
+            }} />
+            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500, letterSpacing: '0.02em' }}>
+              Fetching active lens metadata...
+            </span>
+            <style>{`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}</style>
+          </div>
+        ) : filteredItems.length === 0 ? (
           <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-secondary)', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px', border: '1px dashed var(--panel-border)' }}>
-            <p style={{ fontSize: '13px' }}>No spots verified on your map yet.</p>
-            <p style={{ fontSize: '11px', marginTop: '4px' }}>Drag in a flyer to populate local hotspots!</p>
+            <Info size={20} style={{ color: 'var(--success-color)', marginBottom: '8px', opacity: 0.8 }} />
+            <p style={{ fontSize: '13px', fontWeight: 600, color: 'white' }}>No events or spots found</p>
+            <p style={{ fontSize: '11px', marginTop: '4px', color: 'var(--text-secondary)' }}>
+              {items.length > 0 ? "Try widening your Timeline filter." : "Drag in a flyer to populate Tokyo hotspots!"}
+            </p>
           </div>
         ) : (
-          items.map((item) => (
+          filteredItems.map((item) => (
             <div 
               key={item.id} 
               className="feed-item" 
@@ -38,20 +215,32 @@ const PulseFeed: React.FC<PulseFeedProps> = ({ items, onItemClick }) => {
               style={{
                 background: 'rgba(255, 255, 255, 0.02)',
                 border: '1px solid var(--panel-border)',
-                borderRadius: '12px',
+                borderRadius: '16px',
                 padding: '12px',
                 display: 'flex',
                 gap: '12px',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease',
+                transition: 'all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
+                e.currentTarget.style.borderColor = 'rgba(0, 210, 255, 0.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
+                e.currentTarget.style.borderColor = 'var(--panel-border)';
               }}
             >
               <div 
                 className="feed-image"
                 style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '8px',
+                  width: '52px',
+                  height: '52px',
+                  borderRadius: '10px',
                   background: item.tags.includes('event') ? 'linear-gradient(135deg, #7b61ff 0%, #3b2bc5 100%)' : 'linear-gradient(135deg, #00d2ff 0%, #007699 100%)',
                   display: 'flex',
                   alignItems: 'center',
@@ -59,8 +248,8 @@ const PulseFeed: React.FC<PulseFeedProps> = ({ items, onItemClick }) => {
                   color: 'white',
                   fontSize: '18px',
                   fontWeight: 'bold',
-                  fontFamily: 'Outfit, sans-serif',
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  flexShrink: 0
                 }}
               >
                 {item.sourceImage ? (
@@ -69,19 +258,33 @@ const PulseFeed: React.FC<PulseFeedProps> = ({ items, onItemClick }) => {
                   item.title.charAt(0)
                 )}
               </div>
-              <div className="feed-content" style={{ flex: 1, minWidth: 0 }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'white', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</h3>
-                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.location}</p>
+              
+              <div className="feed-content" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'white', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {item.title}
+                </h3>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {item.location}
+                </p>
+                
+                {/* Event Time Hint under Title (if Event) */}
+                {item.tags.includes('event') && item.date_time && (
+                  <div style={{ fontSize: '10px', color: 'var(--success-color, #00d2ff)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px', marginBottom: '6px' }}>
+                    <Calendar size={10} />
+                    <span>{item.date_time}</span>
+                  </div>
+                )}
+
                 <div className="tag-container" style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                  {item.tags.map(tag => (
+                  {item.tags.slice(0, 3).map(tag => (
                     <span 
                       key={tag} 
                       className="tag"
                       style={{
-                        fontSize: '10px',
+                        fontSize: '9px',
                         padding: '2px 6px',
-                        borderRadius: '4px',
-                        background: 'rgba(255, 255, 255, 0.05)',
+                        borderRadius: '6px',
+                        background: 'rgba(255, 255, 255, 0.04)',
                         border: '1px solid rgba(255, 255, 255, 0.05)',
                         color: 'var(--text-secondary)'
                       }}
