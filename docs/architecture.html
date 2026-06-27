@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Lens Architecture Diagram</title>
+    <!-- Google Fonts for styling -->
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Google Sans', sans-serif;
+            background-color: #F8F9FA;
+            color: #202124;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            max-width: 1000px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #1a73e8;
+            margin-top: 0;
+        }
+        p.desc {
+            color: #5f6368;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+    <!-- Load Mermaid.js -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Local Lens System Architecture</h1>
+        <p class="desc">The "Snap & Build" flow and underlying infrastructure powered by Google Cloud and Gemini AI.</p>
+        
+        <div class="mermaid">
+            flowchart TD
+                %% Styling
+                classDef client fill:#4285F4,stroke:#fff,stroke-width:2px,color:#fff,border-radius:8px
+                classDef server fill:#34A853,stroke:#fff,stroke-width:2px,color:#fff,border-radius:8px
+                classDef ai fill:#BE8CFF,stroke:#fff,stroke-width:2px,color:#fff,border-radius:8px
+                classDef db fill:#FBBC05,stroke:#fff,stroke-width:2px,color:#333,border-radius:8px
+                classDef external fill:#EA4335,stroke:#fff,stroke-width:2px,color:#fff,border-radius:8px
+                
+                subgraph ClientLayer ["Client Layer (Web / Mobile)"]
+                    UI["React / Next.js Map UI\n(Mapbox Integration)"]:::client
+                    Chat["Local Lens Concierge\n(Chat Interface)"]:::client
+                end
+                
+                subgraph CloudInfra ["Google Cloud Run (Compute)"]
+                    API["Node.js / Express API Gateway"]:::server
+                    AgentManager["Agent Orchestrator\n(Background Workers)"]:::server
+                end
+                
+                subgraph GoogleAI ["Gemini AI Layer"]
+                    VisionAPI["Gemini Multimodal API\n(Image-to-JSON Parser)"]:::ai
+                    TextAPI["Gemini Text API\n(Logic & Chat Reasoning)"]:::ai
+                end
+                
+                subgraph DataLayer ["Data Storage"]
+                    Firestore[("Cloud Firestore\n(Events, Venues, Geo-data)")]:::db
+                end
+                
+                subgraph External ["External RAG / Search"]
+                    WebSearch["Google Grounding / Web\n(Fetch Lat/Long, Links)"]:::external
+                end
+                
+                %% Main Application Flow
+                UI -- "1. Uploads Flyer Image" --> API
+                API -- "2. Sends Image Payload" --> VisionAPI
+                VisionAPI -- "3. Returns Extracted Entity (JSON)" --> API
+                
+                API -- "4. Queues Enrichment Task" --> AgentManager
+                AgentManager -- "Orchestrates Reasoning" --> TextAPI
+                AgentManager -- "5. Searches for Geo/Event Links" --> WebSearch
+                AgentManager -- "6. Commits Verified Data" --> Firestore
+                
+                UI -- "7. Streams Live Updates" --> Firestore
+                
+                %% Chat Flow
+                Chat -- "Asks Local Question" --> API
+                API -- "Queries DB for Context" --> Firestore
+                API -- "Context + Prompt" --> TextAPI
+                TextAPI -- "Returns Grounded Answer" --> Chat
+        </div>
+    </div>
+</body>
+</html>
