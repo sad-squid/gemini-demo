@@ -33,7 +33,7 @@ function App() {
       
       <div className="side-panel">
         <div className="panel-header">
-          <h1>LocusGemini</h1>
+          <h1>Local Lens</h1>
           <p>Hyperlocalized Context Builder</p>
         </div>
         

@@ -1,7 +1,7 @@
-# PRODUCT PLAN: LocusGemini (EventLens AI)
+# PRODUCT PLAN: Local Lens (EventLens AI)
 
 ## 1. Executive Summary
-**LocusGemini** is a hyperlocalized event and context builder application designed for the Gemini AI Tokyo Hackathon. It bridges physical real-world discoveries (from flyer photos, restaurant menus, and billboards) with an enriched, digital, interactive hyperlocal map and agentic concierge.
+**Local Lens** is a hyperlocalized event and context builder application designed for the Gemini AI Tokyo Hackathon. It bridges physical real-world discoveries (from flyer photos, restaurant menus, and billboards) with an enriched, digital, interactive hyperlocal map and agentic concierge.
 
 By uploading a single photo, users instantly generate rich structured models of events, venues, or restaurants, enriched autonomously with real-time web search integration, mapping, and a context-aware chat assistant.
 

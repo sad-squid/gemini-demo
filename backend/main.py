@@ -2,7 +2,7 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
-app = FastAPI(title="LocusGemini Backend")
+app = FastAPI(title="Local Lens Backend")
 
 # Allow frontend to communicate with backend
 app.add_middleware(
@@ -15,7 +15,7 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"status": "ok", "message": "LocusGemini API running"}
+    return {"status": "ok", "message": "Local Lens API running"}
 
 @app.post("/api/ingest")
 async def ingest_image(file: UploadFile = File(...)):
