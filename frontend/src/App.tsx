@@ -3,7 +3,6 @@ import { Sparkles, Compass } from 'lucide-react';
 import MapDashboard from './components/MapDashboard';
 import UploadZone from './components/UploadZone';
 import PulseFeed, { type FeedItem } from './components/PulseFeed';
-import ConciergeChat from './components/ConciergeChat';
 import EntitySnackbar from './components/EntitySnackbar';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -11,7 +10,6 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 function App() {
   const [entities, setEntities] = useState<any[]>([]);
   const [center, setCenter] = useState({ lat: 35.6620, lng: 139.7038 }); // Shibuya, Tokyo
-  const [activeTab, setActiveTab] = useState<'discover' | 'concierge'>('discover');
   const [selectedEntity, setSelectedEntity] = useState<any | null>(null);
 
   // 1. Fetch initial spots from DB on load
@@ -154,63 +152,10 @@ function App() {
           <p>Tokyo active AI-guided mapping engine</p>
         </div>
 
-        {/* Tab Navigation Controls */}
-        <div className="tab-navigation" style={{ display: 'flex', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--panel-border)', borderRadius: '12px', padding: '4px', marginBottom: '24px' }}>
-          <button
-            onClick={() => setActiveTab('discover')}
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              padding: '10px 0',
-              fontSize: '13px',
-              fontWeight: 500,
-              color: activeTab === 'discover' ? 'white' : 'var(--text-secondary)',
-              background: activeTab === 'discover' ? 'rgba(255, 255, 255, 0.08)' : 'none',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-          >
-            <Compass size={14} /> Discover Spot
-          </button>
-          <button
-            onClick={() => setActiveTab('concierge')}
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              padding: '10px 0',
-              fontSize: '13px',
-              fontWeight: 500,
-              color: activeTab === 'concierge' ? 'white' : 'var(--text-secondary)',
-              background: activeTab === 'concierge' ? 'rgba(255, 255, 255, 0.08)' : 'none',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-          >
-            <Sparkles size={14} /> LocalGuide
-          </button>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto' }}>
+          <UploadZone onUploadComplete={handleUploadComplete} />
+          <PulseFeed items={feedItems} onItemClick={handleItemClick} />
         </div>
-        
-        {/* Tab Contents */}
-        {activeTab === 'discover' ? (
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto' }}>
-            <UploadZone onUploadComplete={handleUploadComplete} />
-            <PulseFeed items={feedItems} onItemClick={handleItemClick} />
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto' }}>
-            <ConciergeChat />
-          </div>
-        )}
       </div>
     </div>
   );
