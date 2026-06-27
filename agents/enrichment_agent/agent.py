@@ -26,7 +26,7 @@ class EnrichedEntity(BaseModel):
 root_agent = Agent(
     model='gemini-2.5-flash',
     name='enrichment_agent',
-    description='An autonomous search agent that verifies and enriches extracted entities with geolocations, ratings, and social handles.',
+    description='An autonomous search active enrichment agent that verifies and enriches extracted entities with geolocations, ratings, and social handles.',
     instruction=(
         "You are Local Lens's active enrichment agent. Given an extracted entity from a visual upload, "
         "use the google_search tool to perform search grounding. Your job is to:\n"
@@ -53,5 +53,4 @@ root_agent = Agent(
         "}"
     ),
     tools=[GoogleSearchTool()],
-    output_schema=EnrichedEntity,
 )

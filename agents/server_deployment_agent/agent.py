@@ -15,13 +15,13 @@ def deploy_server_infra() -> str:
     root_dir = os.path.dirname(os.path.dirname(agent_dir))
     
     project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "noted-fact-500702-h4")
-    region = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
+    region = os.environ.get("GOOGLE_CLOUD_LOCATION", "asia-northeast1")
     
     print(f"[Server Deploy] Initiating Cloud Run deployment for project {project_id} in {region}...")
     
     # 1. Construct the gcloud deploy command
     deploy_cmd = [
-        "gcloud", "run", "deploy", "local-lens",
+        "gcloud", "run", "deploy", "gemini-demo",
         "--source", ".",
         "--project", project_id,
         "--region", region,

@@ -68,10 +68,7 @@ async def ingest_image(file: UploadFile = File(...)):
     bucket_name = f"{project_id}-uploads"
     storage_client = storage.Client(project=project_id)
     
-    try:
-        bucket = storage_client.get_bucket(bucket_name)
-    except Exception:
-        bucket = storage_client.create_bucket(bucket_name, location="us-central1")
+    bucket = storage_client.bucket(bucket_name)
         
     unique_filename = f"{uuid.uuid4()}-{file.filename}"
     blob = bucket.blob(unique_filename)
