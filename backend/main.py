@@ -39,7 +39,7 @@ class ChatRequest(BaseModel):
 
 @app.get("/")
 def read_root():
-    return {"status": "ok", "message": "LocusGemini API running"}
+    return {"status": "ok", "message": "Local Lens API running"}
 
 @app.get("/api/locations")
 def get_locations():

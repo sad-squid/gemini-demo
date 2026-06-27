@@ -1,5 +1,5 @@
-import React from 'react';
-import { APIProvider, Map, AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
+import React, { useEffect } from 'react';
+import { APIProvider, Map, AdvancedMarker, Pin, useMap } from '@vis.gl/react-google-maps';
 
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
@@ -16,6 +16,16 @@ interface MapDashboardProps {
   center: { lat: number; lng: number };
 }
 
+const MapUpdater: React.FC<{ center: {lat: number, lng: number} }> = ({ center }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (map) {
+      map.panTo(center);
+    }
+  }, [map, center]);
+  return null;
+};
+
 const MapDashboard: React.FC<MapDashboardProps> = ({ markers, center }) => {
   return (
     <div style={{ width: '100%', height: '100%' }}>
@@ -24,10 +34,12 @@ const MapDashboard: React.FC<MapDashboardProps> = ({ markers, center }) => {
           defaultCenter={{ lat: 35.6620, lng: 139.7038 }}
           center={center}
           defaultZoom={15}
+          gestureHandling={'greedy'}
           mapId="LOCUS_GEMINI_MAP_ID"
           disableDefaultUI={false}
           style={{ width: '100%', height: '100%' }}
         >
+          <MapUpdater center={center} />
           {markers.map((marker) => (
              <AdvancedMarker key={marker.id} position={{ lat: marker.lat, lng: marker.lng }} title={marker.title}>
                <Pin 

@@ -11,7 +11,7 @@ style: |
   h2 { color: #4285F4; }
 ---
 
-# SceneScout
+# Local Lens
 **Hyperlocalized Context Builder from Everyday Photos**
 
 Gemini AI Tokyo Hackathon 2026
@@ -29,12 +29,12 @@ cuongduong.git@gmail.com
 
 ---
 
-# 2. The Solution: SceneScout
+# 2. The Solution: Local Lens
 **From Raw Pixel to Enriched Intelligence**
 
-SceneScout instantly bridges the physical world with a digital, interactive hyperlocal map.
+Local Lens instantly bridges the physical world with a digital, interactive hyperlocal map.
 
-By uploading a single photo, SceneScout uses **Multimodal Gemini AI** to generate a rich structured model of an event, venue, or restaurant. 
+By uploading a single photo, Local Lens uses **Multimodal Gemini AI** to generate a rich structured model of an event, venue, or restaurant. 
 It doesn't stop there: our **Agentic Search** fetches the missing pieces—like exact coordinates, links, and real-time schedules—fully autonomously.
 
 ---
@@ -46,7 +46,7 @@ It doesn't stop there: our **Agentic Search** fetches the missing pieces—like 
 2. **Agentic Enrichment:** 
    An autonomous agent queries the web to find exact geo-coordinates, official ticketing links, and resolves ambiguous dates (e.g., "Next Friday" -> exact date).
 3. **Interactive Map & Concierge:** 
-   The data is dropped onto a shared, live map dashboard. Users can ask the **LocusGuide Chatbot** (powered by Gemini) for recommendations based purely on the uploaded data.
+   The data is dropped onto a shared, live map dashboard. Users can ask the **Local Lens Chatbot** (powered by Gemini) for recommendations based purely on the uploaded data.
 
 ---
 
@@ -57,18 +57,18 @@ It doesn't stop there: our **Agentic Search** fetches the missing pieces—like 
 *   **Backend:** Node.js/Express API handling orchestration.
 *   **AI & Agents:** 
     *   **Gemini Multimodal Vision API** (Ingestion)
-    *   **Gemini Text API** (LocusGuide Chatbot & Autonomous Search Agent)
+    *   **Gemini Text API** (Local Lens Chatbot & Autonomous Search Agent)
 *   **Database:** Google Cloud Firestore (Storing venues, events, geo-indices).
 *   **Infrastructure:** Deployed scalably on **Google Cloud Run**.
 
 ---
 
-# 5. Innovation: Why SceneScout Stands Out
+# 5. Innovation: Why Local Lens Stands Out
 **Leveraging the Latest Gemini Capabilities**
 
 - **Multimodal Generation:** We don't rely on users typing out event forms. The AI "sees" the flyer, understands the visual hierarchy, and extracts meaning automatically.
 - **Managed Agent Workflows:** The app isn't just a static wrapper. It spins up backend agents that actively crawl the web to find the *missing context* the flyer didn't explicitly state.
-- **Grounded Chat:** The LocusGuide concierge isn't hallucinating—it explicitly grounds its answers in the exact entities stored in our Firestore database.
+- **Grounded Chat:** The Local Lens concierge isn't hallucinating—it explicitly grounds its answers in the exact entities stored in our Firestore database.
 
 ---
 
@@ -76,7 +76,7 @@ It doesn't stop there: our **Agentic Search** fetches the missing pieces—like 
 
 *   **Snap & Build:** Frictionless visual ingestion of data.
 *   **Pulse Feed & Vibe Filters:** Explore Tokyo events by vibe (e.g., *Cyberpunk*, *Cozy*, *Underground*).
-*   **LocusGuide Concierge:** "What acoustic gigs are near Shibuya tonight?"
+*   **Local Lens Concierge:** "What acoustic gigs are near Shibuya tonight?"
 *   **Real-time Shared Map:** A collaborative map built entirely from user-submitted photography.
 
 ---
@@ -88,7 +88,7 @@ It doesn't stop there: our **Agentic Search** fetches the missing pieces—like 
 2. The UI immediately displaying the successfully structured JSON extraction.
 3. The background agent enriching the location into latitude/longitude coordinates.
 4. The event dynamically popping up on our interactive map.
-5. Asking the LocusGuide Chatbot to plan an itinerary around the new event.
+5. Asking the Local Lens Chatbot to plan an itinerary around the new event.
 
 ---
 

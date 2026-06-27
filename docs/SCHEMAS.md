@@ -1,4 +1,4 @@
-# DATA SCHEMAS: LocusGemini
+# DATA SCHEMAS: Local Lens
 
 These data schemas define the JSON outputs produced by the **Gemini Ingestion Parser** and enriched by the **Agentic Web Enrichment Worker**. Unified typing ensures compatibility across local parsing endpoints, Firestore collections, and the client Map UI.
 

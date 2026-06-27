@@ -1,7 +1,7 @@
-# PRODUCT PLAN: LocusGemini (EventLens AI)
+# PRODUCT PLAN: Local Lens (EventLens AI)
 
 ## 1. Executive Summary
-**LocusGemini** is a hyperlocalized event and context builder application designed for the Gemini AI Tokyo Hackathon. It bridges physical real-world discoveries (from flyer photos, restaurant menus, and billboards) with an enriched, digital, interactive hyperlocal map and agentic concierge.
+**Local Lens** is a hyperlocalized event and context builder application designed for the Gemini AI Tokyo Hackathon. It bridges physical real-world discoveries (from flyer photos, restaurant menus, and billboards) with an enriched, digital, interactive hyperlocal map and agentic concierge.
 
 By uploading a single photo, users instantly generate rich structured models of events, venues, or restaurants, enriched autonomously with real-time web search integration, mapping, and a context-aware chat assistant.
 
@@ -23,10 +23,10 @@ By uploading a single photo, users instantly generate rich structured models of 
 2. **Pulse Feed**: A timeline of upcoming events and trending spots filtered by location and "vibe" tags (e.g., *Cyberpunk*, *Cozy*, *Acoustic*, *Underground*).
 3. **Vibe Filters**: Categorize discoveries by categories (Events, Venues, Food & Drink) and temporal filters (Today, This Weekend, Next Week).
 
-### Flow C: LocusGuide Concierge (AI Agent Chat)
+### Flow C: Local Lens Concierge (AI Agent Chat)
 1. **Context-Grounded Chat**: A side-panel chatbot grounded in all uploaded and parsed events/venues in the active viewport.
 2. **Intelligent Querying**: Users ask: *"What acoustic gigs are happening around Shibuya tonight that serve craft beer?"* or *"Plan a 3-hour itinerary around our newly added gallery event."*
-3. **Structured Recommendations**: LocusGuide renders clickable map-link chips directly in the chat output.
+3. **Structured Recommendations**: Local Lens Concierge renders clickable map-link chips directly in the chat output.
 
 ---
 
@@ -45,7 +45,7 @@ graph TD
     
     API -->|Persist Context| DB[(Cloud Firestore)]
     
-    User -->|Ask Chatbot| AgenticChat[LocusGuide Agent]
+    User -->|Ask Chatbot| AgenticChat[Local Lens Concierge Agent]
     AgenticChat -->|Query Grounded Data| DB
     AgenticChat -->|Retrieve Answer| User
 ```
@@ -57,7 +57,7 @@ graph TD
 4. **Agent Suite**:
    - **Ingestion Agent**: Grounded image parser.
    - **Enrichment Agent**: Active web-searching worker utilizing Google Search Grounding to verify addresses, dates, and ticket prices.
-   - **Concierge Agent (LocusGuide)**: Conversational agent using Gemini's system instructions and Firestore search function tool calling to guide users.
+   - **Concierge Agent (Local Lens Concierge)**: Conversational agent using Gemini's system instructions and Firestore search function tool calling to guide users.
 
 ---
 
