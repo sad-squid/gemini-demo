@@ -167,6 +167,7 @@ const UploadZone: React.FC<UploadZoneProps> = ({ onUploadComplete }) => {
         onChange={handleFileChange} 
         style={{ display: 'none' }} 
         accept="image/*"
+        capture="environment"
       />
       
       {!isUploading ? (
