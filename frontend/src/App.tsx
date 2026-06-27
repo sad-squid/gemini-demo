@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, Compass } from 'lucide-react';
 import MapDashboard from './components/MapDashboard';
 import UploadZone from './components/UploadZone';
 import PulseFeed, { type FeedItem } from './components/PulseFeed';

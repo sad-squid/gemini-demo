@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin } from 'lucide-react';
+import { X, MapPin, Globe, Share2, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface EntitySnackbarProps {
   entity: any | null;
@@ -8,6 +8,13 @@ interface EntitySnackbarProps {
 }
 
 const EntitySnackbar: React.FC<EntitySnackbarProps> = ({ entity, onClose }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Reset expansion state when selected entity changes
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [entity]);
+
   return (
     <AnimatePresence>
       {entity && (
@@ -80,15 +87,102 @@ const EntitySnackbar: React.FC<EntitySnackbarProps> = ({ entity, onClose }) => {
               </h3>
             </div>
             
-            <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--text-secondary, #b3b3b3)', lineHeight: 1.4 }}>
-              {entity.description}
-            </p>
+            <div>
+              <p style={{ margin: '0 0 4px 0', fontSize: '14px', color: 'var(--text-secondary, #b3b3b3)', lineHeight: 1.4 }}>
+                {isExpanded 
+                  ? entity.description 
+                  : (entity.description && entity.description.length > 64 
+                      ? `${entity.description.slice(0, 64)}...` 
+                      : entity.description)
+                }
+              </p>
+              {entity.description && entity.description.length > 64 && (
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--primary-color, #7b61ff)',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    padding: 0,
+                    marginBottom: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  {isExpanded ? (
+                    <>Show less <ChevronUp size={14} /></>
+                  ) : (
+                    <>Show more <ChevronDown size={14} /></>
+                  )}
+                </button>
+              )}
+            </div>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary, #b3b3b3)', fontSize: '13px' }}>
-              <MapPin size={14} />
-              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {entity.address || 'Tokyo, Japan'}
-              </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary, #b3b3b3)', fontSize: '13px' }}>
+                <MapPin size={14} />
+                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {entity.address || 'Tokyo, Japan'}
+                </span>
+              </div>
+
+              {entity.official_website && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
+                  <Globe size={14} style={{ color: 'var(--primary-color, #7b61ff)' }} />
+                  <a 
+                    href={entity.official_website} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ 
+                      color: 'var(--primary-color, #7b61ff)', 
+                      textDecoration: 'none',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    Official Website <ExternalLink size={12} />
+                  </a>
+                </div>
+              )}
+
+              {entity.social_media_links && entity.social_media_links.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'start', gap: '6px', fontSize: '13px' }}>
+                  <Share2 size={14} style={{ color: '#00d2ff', marginTop: '2px' }} />
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                    {entity.social_media_links.map((link: string, index: number) => {
+                      let label = "Social Link";
+                      if (link.includes("instagram.com")) label = "Instagram";
+                      else if (link.includes("x.com") || link.includes("twitter.com")) label = "X / Twitter";
+                      else if (link.includes("facebook.com")) label = "Facebook";
+                      
+                      return (
+                        <a 
+                          key={index}
+                          href={link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          style={{ 
+                            color: '#00d2ff', 
+                            textDecoration: 'none',
+                            fontWeight: 500,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          {label} <ExternalLink size={12} />
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
             
             {entity.vibe_tags && entity.vibe_tags.length > 0 && (
