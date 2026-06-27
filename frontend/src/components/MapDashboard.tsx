@@ -9,6 +9,7 @@ interface MarkerData {
   lng: number;
   title: string;
   type: string;
+  suggested_emoji?: string;
 }
 
 interface MapDashboardProps {
@@ -47,11 +48,12 @@ const MapDashboard: React.FC<MapDashboardProps> = ({ markers, center, onMarkerCl
                title={marker.title}
                onClick={() => onMarkerClick && onMarkerClick(marker.id)}
              >
-               <Pin 
-                 background={marker.type === 'event' ? '#7b61ff' : '#00d2ff'} 
-                 borderColor={marker.type === 'event' ? '#5a42d1' : '#009ebd'} 
-                 glyphColor={'#fff'} 
-               />
+                <Pin 
+                  background={marker.type === 'event' ? '#7b61ff' : (marker.type === 'restaurant' ? '#10b981' : '#00d2ff')} 
+                  borderColor={marker.type === 'event' ? '#5a42d1' : (marker.type === 'restaurant' ? '#059669' : '#009ebd')} 
+                  glyph={marker.suggested_emoji || (marker.type === 'event' ? '🎫' : (marker.type === 'restaurant' ? '🍜' : '📍'))}
+                  glyphColor={'#fff'} 
+                />
              </AdvancedMarker>
           ))}
         </Map>

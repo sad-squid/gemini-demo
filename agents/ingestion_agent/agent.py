@@ -37,6 +37,10 @@ class ExtractedEntity(BaseModel):
         None, 
         description="Phone number, email, official website URL or social media handles mentioned"
     )
+    suggested_emoji: Optional[str] = Field(
+        None, 
+        description="A single relevant emoji representing the vibe or category of this event, restaurant, or venue (e.g. 🏮 for traditional festivals, 🍜 for ramen, 🎸 for rock concerts, 🎫 for exhibition events)"
+    )
     vibe_tags: List[str] = Field(
         default_factory=list, 
         description="A list of 2-5 atmospheric vibe tags representing the mood (e.g. Cozy, Underground, Cyberpunk, Acoustic)"

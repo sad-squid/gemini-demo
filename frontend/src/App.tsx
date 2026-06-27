@@ -118,6 +118,7 @@ function App() {
       lng: e.longitude,
       title: e.name,
       type: e.entity_type,
+      suggested_emoji: e.suggested_emoji
     }));
 
   // 5. Transform entities for Spot list items
@@ -142,6 +143,13 @@ function App() {
         <EntitySnackbar 
           entity={selectedEntity} 
           onClose={() => setSelectedEntity(null)} 
+          entities={entities}
+          onSelectEntity={(entity) => {
+            if (entity.latitude && entity.longitude) {
+              setCenter({ lat: entity.latitude, lng: entity.longitude });
+            }
+            setSelectedEntity(entity);
+          }}
         />
       </div>
       
