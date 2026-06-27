@@ -2,7 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { UploadCloud } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const UploadZone: React.FC = () => {
+interface UploadZoneProps {
+  onUploadComplete: (data: any) => void;
+}
+
+const UploadZone: React.FC<UploadZoneProps> = ({ onUploadComplete }) => {
   const [isDragActive, setIsDragActive] = useState(false);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -15,16 +19,30 @@ const UploadZone: React.FC = () => {
     setIsDragActive(false);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragActive(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
       console.log('File dropped:', file.name);
-      // TODO: Handle file upload to backend
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      try {
+        const response = await fetch('http://localhost:8000/api/ingest', {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await response.json();
+        console.log('Extraction Result:', result);
+        onUploadComplete(result.data);
+      } catch (err) {
+        console.error('Failed to upload file:', err);
+      }
     }
-  }, []);
+  }, [onUploadComplete]);
 
   return (
     <motion.div 
